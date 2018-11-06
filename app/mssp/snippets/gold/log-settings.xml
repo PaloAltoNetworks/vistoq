@@ -1,0 +1,33 @@
+      <syslog>
+        <entry name="MSSP-syslog">
+          <server>
+            <entry name="MSSP-syslog">
+              <transport>UDP</transport>
+              <port>514</port>
+              <format>BSD</format>
+              <server>192.168.2.5</server>
+              <facility>LOG_USER</facility>
+            </entry>
+          </server>
+        </entry>
+      </syslog>
+      <system>
+        <match-list>
+          <entry name="Send all system logs">
+            <send-syslog>
+              <member>MSSP-syslog</member>
+            </send-syslog>
+            <filter>All Logs</filter>
+          </entry>
+        </match-list>
+      </system>
+      <config>
+        <match-list>
+          <entry name="log Configuration logs">
+            <send-syslog>
+              <member>MSSP-syslog</member>
+            </send-syslog>
+            <filter>All Logs</filter>
+          </entry>
+        </match-list>
+      </config>

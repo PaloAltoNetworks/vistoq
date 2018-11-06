@@ -1,0 +1,20 @@
+{% extends "mssp/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="card border-primary mb-6">
+        <div class="card-header text-white bg-primary">Activate Security Service</div>
+        <div class="card-body">
+            <h4 class="card-title">Service Request Information</h4>
+            <p class="card-text">
+            <form action="/configure" method="post">
+                {% csrf_token %}
+                {% include 'mssp/bootstrap_form.html' with form=form %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

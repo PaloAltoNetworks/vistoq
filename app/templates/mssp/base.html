@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vistoq MSSP Portal</title>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<img src="{% static 'images/Vistoq-header.png' %}" class="img-fluid"/>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02"
+            aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor02">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    Provisioning
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/configure">Provision New Security Services</a>
+                    <a class="dropdown-item" href="/mssp/services">View Existing Services</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop0" data-toggle="dropdown">
+                    Deployment
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/mssp/deploy">Deploy Pan-OS NGFW</a>
+                    <a class="dropdown-item" href="/mssp/nodes">Whitebox Node Status</a>
+                    <a class="dropdown-item" href="/mssp/vms">Show Deployed NGFWs</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop2" data-toggle="dropdown">
+                    Admin Portal
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Configure Panorama Access</a>
+                    <a class="dropdown-item" href="#">Manage Auth Codes</a>
+                    <a class="dropdown-item" href="#">Create VM Auth Key</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop3" data-toggle="dropdown">
+                    Documentation
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Portal User Guide</a>
+                    <a class="dropdown-item" href="#">Github Repository</a>
+                    <a class="dropdown-item" href="#">MSSP More Information</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div id="page-content-wrapper">
+    <div class="page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 my-5">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<entry name="MSSP">
+      <rules>
+        <entry name="Block-critical-high-medium">
+          <action>
+            <reset-both/>
+          </action>
+          <severity>
+            <member>critical</member>
+            <member>high</member>
+            <member>medium</member>
+          </severity>
+          <threat-name>any</threat-name>
+          <category>any</category>
+          <packet-capture>single-packet</packet-capture>
+        </entry>
+        <entry name="Any-severity">
+          <action>
+            <default/>
+          </action>
+          <severity>
+            <member>any</member>
+          </severity>
+          <threat-name>any</threat-name>
+          <category>any</category>
+          <packet-capture>single-packet</packet-capture>
+        </entry>
+      </rules>
+      <botnet-domains>
+        <packet-capture>single-packet</packet-capture>
+        <sinkhole>
+          <ipv4-address>pan-sinkhole-default-ip</ipv4-address>
+          <ipv6-address>::1</ipv6-address>
+        </sinkhole>
+        <lists>
+          <entry name="default-paloalto-dns">
+            <action>
+              <sinkhole/>
+            </action>
+          </entry>
+        </lists>
+      </botnet-domains>
+      <description>PANOS-08.0 ver-1.1</description>
+    </entry>

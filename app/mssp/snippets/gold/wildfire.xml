@@ -1,0 +1,27 @@
+    <report-benign-file>yes</report-benign-file>
+    <report-grayware-file>yes</report-grayware-file>
+    <file-size-limit>
+      <entry name="pe">
+        <size-limit>10</size-limit>
+      </entry>
+      <entry name="apk">
+        <size-limit>50</size-limit>
+      </entry>
+      <entry name="pdf">
+        <size-limit>1000</size-limit>
+      </entry>
+      <entry name="ms-office">
+        <size-limit>10000</size-limit>
+      </entry>
+      <entry name="jar">
+        <size-limit>10</size-limit>
+      </entry>
+      <entry name="flash">
+        <size-limit>10</size-limit>
+      </entry>
+      <entry name="MacOSX">
+        <size-limit>50</size-limit>
+      </entry>
+    </file-size-limit>
+
+

@@ -1,0 +1,14 @@
+<rules>
+  <entry name="intrazone-default">
+    <action>allow</action>
+    <log-start>yes</log-start>
+    <log-end>no</log-end>
+    <log-setting>MSSP-logging</log-setting>
+  </entry>
+  <entry name="interzone-default">
+    <action>deny</action>
+    <log-start>yes</log-start>
+    <log-end>no</log-end>
+    <log-setting>MSSP-logging</log-setting>
+  </entry>
+</rules>

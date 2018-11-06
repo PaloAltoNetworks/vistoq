@@ -1,0 +1,15 @@
+          <virus>
+            <member>MSSP</member>
+          </virus>
+          <spyware>
+            <member>MSSP</member>
+          </spyware>
+          <vulnerability>
+            <member>MSSP</member>
+          </vulnerability>
+          <file-blocking>
+            <member>MSSP-unknown-url</member>
+          </file-blocking>
+          <wildfire-analysis>
+          <member>MSSP</member>
+        </wildfire-analysis>

@@ -1,0 +1,23 @@
+{% extends "mssp/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="card border-primary mb-6">
+        <div class="card-header text-white bg-primary">Configure Security Service</div>
+        <div class="card-body">
+            <h4 class="card-title">Service Type Specific Information</h4>
+            <p class="card-text">
+            <form action="/provision" method="post">
+                {% csrf_token %}
+                {% include 'mssp/bootstrap_form.html' with form=form %}
+                <input type="hidden" name="service_id" value="{{ service.name }}"/>
+                <input type="hidden" name="customer_name" value="{{ customer_name }}"/>
+                <input type="hidden" name="service_tier" value="{{ service_tier }}"/>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            </p>
+        </div>
+    </div>
+
+{% endblock %}

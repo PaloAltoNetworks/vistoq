@@ -1,0 +1,42 @@
+        <entry name="MSSP-logging">
+          <match-list>
+            <entry name="WF-malicious">
+              <log-type>wildfire</log-type>
+              <filter>(verdict eq malicious)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="WF-grayware">
+              <log-type>wildfire</log-type>
+              <filter>(verdict eq grayware)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="Threat-critical">
+              <log-type>threat</log-type>
+              <filter>(severity eq critical)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="Threat-high">
+              <log-type>threat</log-type>
+              <filter>(severity eq high)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="Threat-medium">
+              <log-type>threat</log-type>
+              <filter>(severity eq medium)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="URL-blocked-sites">
+              <action-desc>URL blocking based on temp late settings </action-desc>
+              <log-type>url</log-type>
+              <filter>(action eq block)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+            <entry name="Traffic-drop-policy">
+              <action-desc>EDL and any other drop rules</action-desc>
+              <log-type>traffic</log-type>
+              <filter>(action eq block)</filter>
+              <send-to-panorama>yes</send-to-panorama>
+            </entry>
+          </match-list>
+          <description>MSSP log forwarding settings</description>
+        </entry>

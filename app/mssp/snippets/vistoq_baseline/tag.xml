@@ -1,0 +1,20 @@
+      <entry name="Gold">
+        <color>color4</color>
+      </entry>
+      <entry name="Bronze">
+        <color>color5</color>
+      </entry>
+      <entry name="Silver">
+        <color>color11</color>
+      </entry>
+      <entry name="L3-untrust">
+        <color>color1</color>
+      </entry>
+      <entry name="L3-trust">
+        <color>color2</color>
+      </entry>
+      <entry name="PANOS-08.0"/>
+      <entry name="ver-1.1"/>
+      <entry name="guest">
+        <color>color3</color>
+      </entry>
