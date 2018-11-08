@@ -2,7 +2,7 @@
 FROM python:alpine
 
 LABEL description="Vistoq2 Demo Portal"
-LABEL version="1.0"
+LABEL version="1.1"
 LABEL maintainer="nembery@paloaltonetworks.com"
 
 WORKDIR /app
@@ -11,6 +11,7 @@ RUN apk add --no-cache git
 RUN pip install -r requirements.txt
 COPY app /app/vistoq
 #COPY tests /app/tests
+RUN rm /app/vistoq/db.sqlite3
 RUN python /app/vistoq/manage.py migrate
 RUN python /app/vistoq/manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('vistoq', 'admin@example.com', 'Vistoq123!!!')"
 
