@@ -36,19 +36,24 @@ def panorama_login():
     except pan.xapi.PanXapiError as pxe:
         print('Got error logging in to Panorama')
         print(pxe)
-        return False
+        return None
 
 
 def test_panorama():
     xapi = panorama_login()
+
+    if xapi is None:
+        print('Could not test Panorama')
+        return None
+
     xapi.op(cmd='show system info', cmd_xml=True)
     print(xapi.xml_result())
 
 
 def get_panorama_credentials():
-    panorama_ip = os.environ.get('PANORAMA_IP', '35.199.44.170')
+    panorama_ip = os.environ.get('PANORAMA_IP', '0.0.0.0')
     panorama_username = os.environ.get('PANORAMA_USERNAME', 'admin')
-    panorama_password = os.environ.get('PANORAMA_PASSWORD', 'Clouds123')
+    panorama_password = os.environ.get('PANORAMA_PASSWORD', 'admin')
 
     credentials = dict()
     credentials["hostname"] = panorama_ip
@@ -67,6 +72,10 @@ def get_panorama_credentials():
 def push_service(service, context):
     xapi = panorama_login()
     snippets_dir = Path(os.path.join(settings.BASE_DIR, 'mssp', 'snippets'))
+
+    if xapi is None:
+        print('Could not push service to Panorama')
+        return False
 
     try:
         for snippet in service['snippets']:
@@ -109,6 +118,11 @@ def validate_snippet_present(service, context):
     :return: boolean True if found, false if any xpath is not found
     """
     xapi = panorama_login()
+
+    if xapi is None:
+        print('Could not login to Panorama')
+        return False
+
     try:
         for snippet in service['snippets']:
             xpath = snippet['xpath']
@@ -127,6 +141,7 @@ def validate_snippet_present(service, context):
     except pan.xapi.PanXapiError as pxe:
         print('Could not validate snippet was present!')
         print(pxe)
+        return False
 
 
 def get_device_groups_from_panorama():
@@ -135,12 +150,20 @@ def get_device_groups_from_panorama():
 
     services = list()
 
+    if xapi is None:
+        print('Could not login to Panorama')
+        return services
+
     try:
         xapi.get(device_group_xpath)
         xml = xapi.xml_result()
     except pan.xapi.PanXapiError as pxe:
         print('Could not get device groups from Panorama')
         print(pxe)
+        return services
+
+    if xml is None:
+        print('No services currently defined in panorama')
         return services
 
     doc = et.fromstring(xml)
