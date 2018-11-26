@@ -92,6 +92,12 @@ def push_service(service, context):
                 print('Pushing xpath: %s' % xpath)
                 print('Pushing element: %s' % xml_snippet)
                 xapi.set(xpath=xpath_string, element=xml_snippet)
+                # FIXME - We need to fix this
+                if xapi.status_code == '19' or xapi.status_code == '20':
+                    print('xpath is already present')
+                elif xapi.status_code == '7':
+                    print('xpath was NOT found')
+                    return False
 
         xapi.commit('<commit/>', sync=True)
         print(xapi.xml_result())
@@ -179,3 +185,7 @@ def get_device_groups_from_panorama():
             services.append(service)
 
     return services
+
+
+def generate_sku(size, term, tier):
+    return 'SKU-BUNDLE-2'

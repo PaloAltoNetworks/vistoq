@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import requests
+from requests.exceptions import ConnectionError
 from django.conf import settings
 from jinja2 import Environment, BaseLoader
 
@@ -16,40 +17,48 @@ class SaltUtil():
 
     def __get_salt_auth_token(self):
 
-        print('Here we go')
-        # FIXME - check timeout here
-        if self.auth_token != '':
-            print('we have an auth token already')
-            return True
-        else:
-            print('No auth token found!')
-
-        _auth_json = """
-           {
-            "username" : "%s",
-            "password" : "%s",
-            "eauth": "pam"
-            }
-            """ % (self.username, self.password)
-        print(_auth_json)
-        aj = json.loads(_auth_json)
-        headers = {"Content-Type": "application/json"}
-
-        url = self.base_url + self.login_url
-        print('Using url: %s' % url)
-        res = requests.post(url, json=aj, headers=headers)
-        print(res)
-        if res.status_code == 200:
-            json_results = res.json()
-            if 'return' in json_results:
-                self._auth_token = json_results['return'][0]['token']
-                print(self._auth_token)
+        try:
+            print('Here we go')
+            # FIXME - check timeout here
+            if self.auth_token != '':
+                print('we have an auth token already')
                 return True
             else:
+                print('No auth token found!')
+
+            _auth_json = """
+               {
+                "username" : "%s",
+                "password" : "%s",
+                "eauth": "pam"
+                }
+                """ % (self.username, self.password)
+            print(_auth_json)
+            aj = json.loads(_auth_json)
+            headers = {"Content-Type": "application/json"}
+
+            url = self.base_url + self.login_url
+            print('Using url: %s' % url)
+            res = requests.post(url, json=aj, headers=headers)
+            print(res)
+            if res.status_code == 200:
+                json_results = res.json()
+                if 'return' in json_results:
+                    self._auth_token = json_results['return'][0]['token']
+                    print(self._auth_token)
+                    return True
+                else:
+                    return False
+
+            else:
+                print(res.text)
                 return False
 
-        else:
-            print(res.text)
+        except ConnectionError as ce:
+            print(ce)
+            return False
+        except Exception as e:
+            print(e)
             return False
 
     def get_minion_list(self):
@@ -105,9 +114,14 @@ class SaltUtil():
                     url = self.base_url + '/'
                     headers = {"X-Auth-Token": self._auth_token}
                     payload_json = json.loads(payload)
-                    res = requests.post(url, json=payload_json, headers=headers)
-                    print(res.status_code)
-                    return res.text
+                    try:
+                        res = requests.post(url, json=payload_json, headers=headers)
+                        print(res.status_code)
+                        return res.text
+                    except ConnectionError as ce:
+                        print(ce)
+                        return 'Error during deploy'
+
         except Exception as e:
             print(e)
             print('Caught an error deploying service')
