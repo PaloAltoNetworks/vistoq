@@ -1,7 +1,9 @@
 name: gold
 label: Gold
 description: Gold Advanced Security
-type: service
+type: pan
+action_type: set
+versioon: 1.0
 extends: vistoq_baseline
 variables:
   - name: FW_NAME
