@@ -8,6 +8,7 @@ Running The Demo
 
     cp local.env.example local.env
 
+
 2. Edit the local.env file to reflect your local environment
 
     .. code-block::
@@ -22,7 +23,21 @@ Running The Demo
     . local.env
 
 
-4. launch the application with the manage.py command
+4. Build the local db to prepare the application
+
+    .. code-block::
+
+    ./manage.py migrate
+
+
+5. Create an Admin Username and Password
+
+    .. code-block::
+
+    manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('vistoq', 'admin@example.com', 'BIGSECRET')"
+
+
+6. launch the application with the manage.py command
 
     .. code-block::
 
