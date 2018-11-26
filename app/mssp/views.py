@@ -109,6 +109,12 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
             # prego (it's in there)
             baseline = service['extends']
             baseline_service = snippet_utils.load_snippet_with_name(baseline)
+            # FIX for https://github.com/nembery/vistoq2/issues/5
+            if 'variables' in baseline_service:
+                for v in baseline_service['variables']:
+                    # FIXME - Should include a way show this in UI so we have POSTED values available
+                    jinja_context[v] = baseline_service['variables'][v]['default']
+
             if baseline_service is not None:
                 # check the panorama config to see if it's there or not
                 if not pan_utils.validate_snippet_present(baseline_service, jinja_context):
