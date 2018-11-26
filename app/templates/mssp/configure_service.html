@@ -8,7 +8,7 @@
         <div class="card-body">
             <h4 class="card-title">Service Type Specific Information</h4>
             <p class="card-text">
-            <form action="/provision" method="post">
+            <form action="/mssp/provision" method="post">
                 {% csrf_token %}
                 {% include 'mssp/bootstrap_form.html' with form=form %}
                 <input type="hidden" name="service_id" value="{{ service.name }}"/>

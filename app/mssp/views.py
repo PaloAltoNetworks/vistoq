@@ -52,11 +52,24 @@ class MSSPBaseFormView(FormView):
 
 
 class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
+    """
+    /mssp/configure
+
+    This will instantiate the SimpleDemoForm from forms.py
+
+    Allows the user to choose which snippet to load
+
+    """
     template_name = 'mssp/simple_demo.html'
     form_class = SimpleDemoForm
     success_url = '/'
 
     def form_valid(self, form):
+        """
+        Called when the simple demo form is submitted
+        :param form: SimpleDemoForm
+        :return: rendered html response
+        """
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
         service_name = form.cleaned_data['service_tier']
