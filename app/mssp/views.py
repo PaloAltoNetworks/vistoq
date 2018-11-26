@@ -1,8 +1,10 @@
 # some_app/views.py
+import json
+
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
 from mssp.forms import SimpleDemoForm
@@ -20,7 +22,6 @@ class MSSPView(MSSPBaseAuth, TemplateView):
 
 
 class MSSPBaseFormView(FormView):
-
     overrides = {}
 
     @staticmethod
@@ -186,6 +187,13 @@ class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
 
 
 class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
+    """
+    Show all the VMs currently deployed on the compute node
+
+    GET will show the dynamic form based on the 'show_deployed_vms_on_node' snippet
+
+    POST will load the snippet and execute it against
+    """
     snippet = 'show_deployed_vms_on_node'
     header = 'Vistoq MSSP'
     title = 'Show Deployed VMs on Node'
@@ -200,11 +208,49 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
             if self.request.POST.get(v['name']):
                 jinja_context[v['name']] = self.request.POST.get(v['name'])
 
+        minion = self.request.POST.get('minion')
+        salt_util = salt_utils.SaltUtil()
+        res = salt_util.deploy_service(service, jinja_context)
+        context = dict()
+
+        try:
+            response_obj = json.loads(res)
+            # {"return": [{"compute-01.c.vistoq-demo.internal": {"shoaf1": "shutdown", "stuart1": "shutdown"}}]}
+            fm = response_obj['return'][0]
+            vms = list()
+            if minion in fm:
+                minion_dict = response_obj['return'][0][minion]
+                for m in minion_dict:
+                    vm_detail = dict()
+                    vm_detail['hostname'] = m
+                    vm_detail['status'] = minion_dict[m]
+                    vms.append(vm_detail)
+
+                context['vms'] = vms
+                return render(self.request, 'mssp/deployed_vms.html', context=context)
+            else:
+                context['results'] = response_obj['return'][0]
+                return render(self.request, 'mssp/results.html', context=context)
+        except ValueError as ve:
+            print('Could not parse json')
+            print(ve)
+            context['results'] = {'Error': 'Could not get deployed VMs list!'}
+            return render(self.request, 'mssp/results.html', context=context)
+
+
+class DeleteVMView(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        hostname = self.kwargs['hostname']
+        minion = self.kwargs['minion']
+        service = snippet_utils.load_snippet_with_name('delete_single_vm')
+        jinja_context = dict()
+        for v in service['variables']:
+            if self.request.POST.get(v['name']):
+                jinja_context[v['name']] = self.request.POST.get(v['name'])
+
         salt_util = salt_utils.SaltUtil()
         res = salt_util.deploy_service(service, jinja_context)
         print(res)
-        context = dict()
-        context['results'] = res
-        return render(self.request, 'mssp/results.html', context=context)
-
-
+        print('deleting hostname %s' % hostname)
+        return '/mssp/vms'
