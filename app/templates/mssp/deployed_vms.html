@@ -3,10 +3,27 @@
 
 {% block content %}
 <div class="card border-primary mb-6">
-    <div class="card-header">Results</div>
+    <div class="card-header">Deployment</div>
     <div class="card-body">
-        <h4 class="card-title">Detailed Deployment Results</h4>
-        <p class="card-text">{{ results }}</p>
+        <h4 class="card-title">Currently Deployed Pan-OS NGFWs</h4>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Hostname</th>
+                <th scope="col">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for vm in vms %}
+            <tr>
+                <th scope="row">></th>
+                <td>{{ vm.hostname }}</td>
+                <td>{{ vm.status }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {%  endblock %}
