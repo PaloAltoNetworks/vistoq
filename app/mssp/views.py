@@ -136,10 +136,12 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
             baseline = service['extends']
             baseline_service = snippet_utils.load_snippet_with_name(baseline)
             # FIX for https://github.com/nembery/vistoq2/issues/5
-            if 'variables' in baseline_service:
+            if 'variables' in baseline_service and type(baseline_service['variables']) is list:
                 for v in baseline_service['variables']:
                     # FIXME - Should include a way show this in UI so we have POSTED values available
-                    jinja_context[v] = baseline_service['variables'][v]['default']
+                    if 'default' in v:
+                        print('Setting default from baseline on context for %s' % v['name'])
+                        jinja_context[v['name']] = v['default']
 
             if baseline_service is not None:
                 # check the panorama config to see if it's there or not
@@ -147,11 +149,11 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
                     # no prego (it's not in there)
                     print('Pushing configuration dependency: %s' % baseline_service['name'])
                     # make it prego
-                    pan_utils.push_service(baseline_service, jinja_context)
+                    # pan_utils.push_service(baseline_service, jinja_context)
 
         if not pan_utils.validate_snippet_present(service, jinja_context):
             print('Pushing new service: %s' % service['name'])
-            pan_utils.push_service(service, jinja_context)
+            # pan_utils.push_service(service, jinja_context)
         else:
             print('This service was already configured on the server')
 
