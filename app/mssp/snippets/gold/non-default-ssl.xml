@@ -1,7 +1,0 @@
-           <entry name="MSSP-SSL-non-default-ports">
-              <protocol>
-                <tcp>
-                  <port>465,636,989,990,992,993,995,1514,1521,2376,2484,3269,4567,5223,5228,8443,8531,9091</port>
-                </tcp>
-              </protocol>
-            </entry>

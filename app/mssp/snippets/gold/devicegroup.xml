@@ -1,7 +1,0 @@
- <entry name="{{ FW_NAME }}">
-     <description>Vistoq Managed Service</description>
-      <tag>
-        <entry name="customer_name:{{ customer_name }}"/>
-        <entry name="service_name:{{ service_name }}"/>
-      </tag>
- </entry>

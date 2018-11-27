@@ -1,8 +1,8 @@
 name: skillet_silver
 label: Skillet_silver
 description: Iron-Skillet baseline configuration with silver reductions
-type: service
-extends: vistoq_baseline
+type: baseline
+extends:
 variables:
   - name: FW_NAME
     description: Device Name used for device-group and template stack name
@@ -35,6 +35,12 @@ snippets:
   - name: external_list
     xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/external-list
     file: external_list.xml
+  - name: tag
+    xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/tag
+    file: tag.xml
+  - name: log_settings_profiles
+    xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/log-settings/profiles
+    file: log_settings_profiles.xml
   - name: profiles_decryption
     xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/profiles/decryption
     file: profiles_decryption.xml
