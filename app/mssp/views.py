@@ -64,6 +64,38 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
     form_class = SimpleDemoForm
     success_url = '/'
 
+    def get_context_data(self, **kwargs):
+        """
+        Override get_context_data so we can modify the SimpleDemoForm as necessary.
+        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        :param kwargs:
+        :return:
+        """
+        form = self.get_form()
+
+        # load all snippets with a type of 'service'
+        services = snippet_utils.load_snippets_of_type('service')
+
+        # we need to construct a new ChoiceField with the following basic format
+        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        choices_list = list()
+        # grab each service and construct a simple tuple with name and label, append to the list
+        for service in services:
+            choice = (service['name'], service['label'])
+            choices_list.append(choice)
+
+        # let's sort the list by the label attribute (index 1 in the tuple)
+        choices_list = sorted(choices_list, key=lambda k: k[1])
+        # convert our list of tuples into a tuple itself
+        choices_set = tuple(choices_list)
+        # make our new field
+        new_choices_field = forms.ChoiceField(choices=choices_set)
+        # set it on the original form, overwriting the hardcoded GSB version
+        form.fields['service_tier'] = new_choices_field
+        # save to kwargs and call parent for additional processing
+        kwargs['form'] = form
+        return super().get_context_data(**kwargs)
+
     def form_valid(self, form):
         """
         Called when the simple demo form is submitted
@@ -140,8 +172,10 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
                 for v in baseline_service['variables']:
                     # FIXME - Should include a way show this in UI so we have POSTED values available
                     if 'default' in v:
-                        print('Setting default from baseline on context for %s' % v['name'])
-                        jinja_context[v['name']] = v['default']
+                        # Do not overwrite values if they've arrived from the user via the Form
+                        if v['name'] not in jinja_context:
+                            print('Setting default from baseline on context for %s' % v['name'])
+                            jinja_context[v['name']] = v['default']
 
             if baseline_service is not None:
                 # check the panorama config to see if it's there or not
