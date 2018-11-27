@@ -31,6 +31,9 @@ variables:
     type_hint: text
 
 snippets:
+  - name: tag
+    xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/tag
+    file: tag.xml
   - name: profile_group_unknown_url
     xpath: /config/devices/entry[@name='localhost.localdomain']/device-group/entry[@name='{{ FW_NAME }}']/profile-group
     file: profile_group_unknown_url.xml

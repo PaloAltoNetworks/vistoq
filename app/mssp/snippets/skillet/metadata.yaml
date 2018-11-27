@@ -1,7 +1,7 @@
 name: skillet
 label: Skillet
 description: Iron-Skillet baseline configuration
-type: service
+type: baseline
 extends: vistoq_baseline
 variables:
   - name: FW_NAME
