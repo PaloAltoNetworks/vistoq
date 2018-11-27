@@ -149,11 +149,11 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
                     # no prego (it's not in there)
                     print('Pushing configuration dependency: %s' % baseline_service['name'])
                     # make it prego
-                    # pan_utils.push_service(baseline_service, jinja_context)
+                    pan_utils.push_service(baseline_service, jinja_context)
 
         if not pan_utils.validate_snippet_present(service, jinja_context):
             print('Pushing new service: %s' % service['name'])
-            # pan_utils.push_service(service, jinja_context)
+            pan_utils.push_service(service, jinja_context)
         else:
             print('This service was already configured on the server')
 
