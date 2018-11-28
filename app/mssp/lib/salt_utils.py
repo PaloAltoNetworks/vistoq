@@ -99,12 +99,10 @@ class SaltUtil():
             print('Invalid return data')
             return minion_list
 
-        for minion in minion_list_json['return']:
-            # return data is return[0][some_name:some_data]
-
-            # FIXME - will there ever be more than 1 key returned here?
-            minion_name = list(minion.keys())[0]
-            minion_list.append(minion_name)
+        return_dict = minion_list_json['return'][0]
+        for m in list(return_dict.keys()):
+            print(m)
+            minion_list.append(m)
 
         return minion_list
 
