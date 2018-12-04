@@ -1,0 +1,39 @@
+name: service-picker
+label: Service Picker
+description: Silver Advanced Security
+type: template
+extends:
+variables:
+  - name: customer_name
+    description: Customer Name
+    default: ACME
+    type_hint: text
+  - name: service_tier
+    description: Service Tier
+    default: Gold
+    type_hint: text
+  - name: service_term
+    description: Service Term
+    default: 3 year
+    type_hint: dropdown
+    dd_list:
+      - key: 3 Year
+        value: 3
+      - key: 2 Year
+        value: 2
+      - key: 1 Year
+        value: 1
+  - name: service_size
+    description: Service Size
+    default: Small
+    type_hint: dropdown
+    dd_list:
+      - key: Small
+        value: small
+      - key: Medium
+        value: medium
+      - key: Large
+        value: large
+
+snippets:
+

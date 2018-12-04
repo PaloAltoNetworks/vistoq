@@ -25,9 +25,12 @@ from mssp.lib import pan_utils
 from mssp.lib import salt_utils
 from mssp.lib import snippet_utils
 
+from pan_cnc.views import CNCBaseFormView
+
 
 class MSSPBaseAuth(LoginRequiredMixin):
     login_url = '/login'
+    base_html = 'mssp/base.html'
 
 
 class MSSPView(MSSPBaseAuth, TemplateView):
@@ -41,6 +44,7 @@ class MSSPBaseFormView(FormView):
     def generate_dynamic_form(service):
         dynamic_form = forms.Form()
         for variable in service['variables']:
+            print('Adding field %s' % variable['name'])
             field_name = variable['name']
             type_hint = variable['type_hint']
             description = variable['description']
@@ -98,7 +102,12 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
 
         # save to kwargs and call parent for additional processing
         # set it on the original form, overwriting the hardcoded GSB version
+        form.fields['customer_name'] = forms.CharField(label='Customer Name', max_length=100)
         form.fields['service_tier'] = new_choices_field
+
+        form.fields['platform_sizing'] = forms.ChoiceField(choices=(('small', 'Small'), ('medium', 'Medium'), ('large', 'Large')))
+        form.fields['service_term'] = forms.ChoiceField(choices=(('3', '3 Year'), ('2', '2 Year'), ('1', '1 Year')))
+
         # save to kwargs and call parent for additional processing
         kwargs['form'] = form
         return super().get_context_data(**kwargs)
@@ -433,3 +442,55 @@ class DeleteVMView(TemplateView):
         context['results'] = res
 
         return context
+
+
+class TestCNCView(MSSPBaseAuth, CNCBaseFormView):
+    snippet = 'service-picker'
+    header = 'Provision Service'
+    title = 'Configure Service Sales information'
+    app_dir = 'mssp'
+
+    def get_context_data(self, **kwargs):
+        """
+        Override get_context_data so we can modify the SimpleDemoForm as necessary.
+        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        :param kwargs:
+        :return:
+        """
+
+        context = super().get_context_data(**kwargs)
+
+        form = context['form']
+        # load all snippets with a type of 'service'
+        services = snippet_utils.load_snippets_of_type('service')
+
+        # we need to construct a new ChoiceField with the following basic format
+        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        choices_list = list()
+        # grab each service and construct a simple tuple with name and label, append to the list
+        for service in services:
+            choice = (service['name'], service['label'])
+            choices_list.append(choice)
+
+        # let's sort the list by the label attribute (index 1 in the tuple)
+        choices_list = sorted(choices_list, key=lambda k: k[1])
+        # convert our list of tuples into a tuple itself
+        choices_set = tuple(choices_list)
+        # make our new field
+        new_choices_field = forms.ChoiceField(choices=choices_set)
+        # set it on the original form, overwriting the hardcoded GSB version
+
+        form.fields['service_tier'] = new_choices_field
+
+        context['form'] = form
+        return context
+
+    def form_valid(self, form):
+        results = dict()
+        if 'variables' in self.service:
+            for v in self.service['variables']:
+                results[v['name']] = self.request.POST[v['name']]
+
+        context = dict()
+        context['results'] = results
+        return render(self.request, 'mssp/results.html', context=context)
