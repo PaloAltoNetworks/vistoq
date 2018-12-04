@@ -36,8 +36,6 @@ urlpatterns = [
     path('', MSSPView.as_view(), name='mssp'),
     path('login', auth_views.LoginView.as_view(template_name='mssp/login.html'), name='login'),
     path('logout', auth_views.LogoutView.as_view(next_page='login')),
-    path('configure', ConfigureServiceView.as_view()),
-    path('provision', ProvisionServiceView.as_view()),
     path('mssp/', include('mssp.urls'))
 ]
 
