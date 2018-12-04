@@ -61,7 +61,7 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
 
     """
     template_name = 'mssp/simple_demo.html'
-    form_class = SimpleDemoForm
+    form_class = forms.Form
     success_url = '/'
 
     def get_context_data(self, **kwargs):
@@ -90,6 +90,13 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         choices_set = tuple(choices_list)
         # make our new field
         new_choices_field = forms.ChoiceField(choices=choices_set)
+        form.fields['customer_name'] = forms.CharField(label='Customer Name', max_length=100)
+        form.fields['service_tier'] = new_choices_field
+
+        form.fields['platform_sizing'] = forms.ChoiceField(choices=(('small', 'Small'), ('medium', 'Medium'), ('large', 'Large')))
+        form.fields['service_term'] = forms.ChoiceField(choices=(('3', '3 Year'), ('2', '2 Year'), ('1', '1 Year')))
+
+        # save to kwargs and call parent for additional processing
         # set it on the original form, overwriting the hardcoded GSB version
         form.fields['service_tier'] = new_choices_field
         # save to kwargs and call parent for additional processing
@@ -104,9 +111,9 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         """
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
-        service_name = form.cleaned_data['service_tier']
-        customer_name = form.cleaned_data['customer_name']
-        service_term = form.cleaned_data['service_term']
+        service_name = self.request.POST['service_tier']
+        customer_name = self.request.POST['customer_name']
+        service_term = self.request.POST['service_term']
         service = snippet_utils.load_snippet_with_name(service_name)
         print(service)
         dynamic_form = self.generate_dynamic_form(service)
