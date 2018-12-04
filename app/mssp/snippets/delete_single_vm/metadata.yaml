@@ -14,7 +14,7 @@ variables:
     type_hint: text
 snippets:
 
-  - name: delete_vms
-    file: delete_vms.j2
+  - name: delete_vm
+    file: delete_vm.j2
 
 

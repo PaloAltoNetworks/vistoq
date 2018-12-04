@@ -2,7 +2,7 @@
         "client": "local",
         "tgt": "{{ minion }}",
         "fun": "state.apply",
-        "arg": ["delete_all_vms"],
+        "arg": ["delete_all_ngfw"],
         "kwarg": {
             "pillar": {
                 "hostname": "{{ hostname }}"

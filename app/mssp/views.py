@@ -237,6 +237,42 @@ class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
     template_name = 'mssp/deploy_service.html'
     snippet = 'provision_firewall'
 
+    def get_context_data(self, **kwargs):
+        """
+        Override get_context_data so we can modify the SimpleDemoForm as necessary.
+        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        :param kwargs:
+        :return:
+        """
+
+        context = super().get_context_data(**kwargs)
+        form = context['form']
+
+        # load all snippets with a type of 'service'
+        salt_util = salt_utils.SaltUtil()
+        minion_list = salt_util.get_minion_list()
+
+        # we need to construct a new ChoiceField with the following basic format
+        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        choices_list = list()
+        # grab each service and construct a simple tuple with name and label, append to the list
+        for minion in minion_list:
+            minion_label = minion.split('.')[0]
+            choice = (minion, minion_label)
+            choices_list.append(choice)
+
+        # let's sort the list by the label attribute (index 1 in the tuple)
+        choices_list = sorted(choices_list, key=lambda k: k[1])
+        # convert our list of tuples into a tuple itself
+        choices_set = tuple(choices_list)
+        # make our new field
+        new_choices_field = forms.ChoiceField(choices=choices_set)
+        # set it on the original form, overwriting the hardcoded GSB version
+        form.fields['minion'] = new_choices_field
+        # save to kwargs and call parent for additional processing
+        context['form'] = form
+        return context
+
     def form_valid(self, form):
         print('Here we go deploying')
         jinja_context = dict()
@@ -248,9 +284,31 @@ class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
 
         salt_util = salt_utils.SaltUtil()
         res = salt_util.deploy_service(service, jinja_context)
-        print(res)
         context = dict()
-        context['results'] = res
+        try:
+            results_json = json.loads(res)
+        except ValueError as ve:
+            print('Could not load results from provisioner!')
+            print(ve)
+            context['results'] = 'Error deploying VM!'
+            return render(self.request, 'mssp/results.html', context=context)
+
+        if 'minion' not in jinja_context:
+            context['results'] = 'Error deploying VM! No compute node found in response'
+            return render(self.request, 'mssp/results.html', context=context)
+
+        minion = jinja_context['minion']
+        if 'return' in results_json and minion in results_json['return'][0]:
+            r = results_json['return'][0][minion]
+            steps = r.keys()
+            for step in steps:
+                step_detail = r[step]
+                if step_detail['result'] is not True:
+                    context['results'] = 'Error deploying VM! Not all steps completed successfully!\n\n'
+                    context['results'] += step_detail['comment']
+                    return render(self.request, 'mssp/results.html', context=context)
+
+        context['results'] = 'VM Deployed Successfully on CPE: %s' % minion
         return render(self.request, 'mssp/results.html', context=context)
 
 
@@ -267,6 +325,42 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
     title = 'Show Deployed VMs on Node'
     action = '/mssp/vms'
 
+    def get_context_data(self, **kwargs):
+        """
+        Override get_context_data so we can modify the SimpleDemoForm as necessary.
+        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        :param kwargs:
+        :return:
+        """
+
+        context = super().get_context_data(**kwargs)
+        form = context['form']
+
+        # load all snippets with a type of 'service'
+        salt_util = salt_utils.SaltUtil()
+        minion_list = salt_util.get_minion_list()
+
+        # we need to construct a new ChoiceField with the following basic format
+        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        choices_list = list()
+        # grab each service and construct a simple tuple with name and label, append to the list
+        for minion in minion_list:
+            minion_label = minion.split('.')[0]
+            choice = (minion, minion_label)
+            choices_list.append(choice)
+
+        # let's sort the list by the label attribute (index 1 in the tuple)
+        choices_list = sorted(choices_list, key=lambda k: k[1])
+        # convert our list of tuples into a tuple itself
+        choices_set = tuple(choices_list)
+        # make our new field
+        new_choices_field = forms.ChoiceField(choices=choices_set)
+        # set it on the original form, overwriting the hardcoded GSB version
+        form.fields['minion'] = new_choices_field
+        # save to kwargs and call parent for additional processing
+        context['form'] = form
+        return context
+
     def form_valid(self, form):
         print('Here we go deploying')
         jinja_context = dict()
@@ -282,6 +376,10 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
         context = dict()
 
         try:
+            if res is None:
+                context['results'] = 'Could not get deployed VM list, no valid return from CPE'
+                return render(self.request, 'mssp/results.html', context=context)
+
             response_obj = json.loads(res)
             # {"return": [{"compute-01.c.vistoq-demo.internal": {"shoaf1": "shutdown", "stuart1": "shutdown"}}]}
             fm = response_obj['return'][0]
@@ -295,6 +393,7 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
                     vms.append(vm_detail)
 
                 context['vms'] = vms
+                context['minion'] = minion
                 return render(self.request, 'mssp/deployed_vms.html', context=context)
             else:
                 context['results'] = response_obj['return'][0]
@@ -306,19 +405,24 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
             return render(self.request, 'mssp/results.html', context=context)
 
 
-class DeleteVMView(RedirectView):
+class DeleteVMView(TemplateView):
 
-    def get_redirect_url(self, *args, **kwargs):
+    template_name = 'mssp/results.html'
+
+    def get_context_data(self, **kwargs):
         hostname = self.kwargs['hostname']
         minion = self.kwargs['minion']
         service = snippet_utils.load_snippet_with_name('delete_single_vm')
         jinja_context = dict()
         for v in service['variables']:
-            if self.request.POST.get(v['name']):
-                jinja_context[v['name']] = self.request.POST.get(v['name'])
+            if kwargs.get(v['name']):
+                jinja_context[v['name']] = kwargs.get(v['name'])
 
         salt_util = salt_utils.SaltUtil()
         res = salt_util.deploy_service(service, jinja_context)
         print(res)
         print('deleting hostname %s' % hostname)
-        return '/mssp/vms'
+        context = dict()
+        context['results'] = res
+
+        return context
