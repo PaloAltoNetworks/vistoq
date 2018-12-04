@@ -201,11 +201,13 @@ class ProvisionServiceView(MSSPBaseAuth, FormView):
                     # make it prego
                     pan_utils.push_service(baseline_service, jinja_context)
 
-        if not pan_utils.validate_snippet_present(service, jinja_context):
-            print('Pushing new service: %s' % service['name'])
-            pan_utils.push_service(service, jinja_context)
-        else:
-            print('This service was already configured on the server')
+        # BUGFIX to always just push the toplevel service
+        pan_utils.push_service(service, jinja_context)
+        # if not pan_utils.validate_snippet_present(service, jinja_context):
+        #     print('Pushing new service: %s' % service['name'])
+        #     pan_utils.push_service(service, jinja_context)
+        # else:
+        #     print('This service was already configured on the server')
 
         return super().form_valid(form)
 
