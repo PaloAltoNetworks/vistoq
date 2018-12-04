@@ -1,0 +1,3 @@
+[submodule "app/pan_cnc"]
+	path = app/pan_cnc
+	url = https://github.com/nembery/django-pan-cnc
