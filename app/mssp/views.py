@@ -25,9 +25,12 @@ from mssp.lib import pan_utils
 from mssp.lib import salt_utils
 from mssp.lib import snippet_utils
 
+from pan_cnc.views import CNCBaseFormView
+
 
 class MSSPBaseAuth(LoginRequiredMixin):
     login_url = '/login'
+    base_html = 'mssp/base.html'
 
 
 class MSSPView(MSSPBaseAuth, TemplateView):
@@ -41,6 +44,7 @@ class MSSPBaseFormView(FormView):
     def generate_dynamic_form(service):
         dynamic_form = forms.Form()
         for variable in service['variables']:
+            print('Adding field %s' % variable['name'])
             field_name = variable['name']
             type_hint = variable['type_hint']
             description = variable['description']
@@ -61,7 +65,7 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
 
     """
     template_name = 'mssp/simple_demo.html'
-    form_class = SimpleDemoForm
+    form_class = forms.Form
     success_url = '/'
 
     def get_context_data(self, **kwargs):
@@ -91,7 +95,12 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         # make our new field
         new_choices_field = forms.ChoiceField(choices=choices_set)
         # set it on the original form, overwriting the hardcoded GSB version
+        form.fields['customer_name'] = forms.CharField(label='Customer Name', max_length=100)
         form.fields['service_tier'] = new_choices_field
+
+        form.fields['platform_sizing'] = forms.ChoiceField(choices=(('small', 'Small'), ('medium', 'Medium'), ('large', 'Large')))
+        form.fields['service_term'] = forms.ChoiceField(choices=(('3', '3 Year'), ('2', '2 Year'), ('1', '1 Year')))
+
         # save to kwargs and call parent for additional processing
         kwargs['form'] = form
         return super().get_context_data(**kwargs)
@@ -104,9 +113,9 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         """
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
-        service_name = form.cleaned_data['service_tier']
-        customer_name = form.cleaned_data['customer_name']
-        service_term = form.cleaned_data['service_term']
+        service_name = self.request.POST['service_tier']
+        customer_name = self.request.POST['customer_name']
+        service_term = self.request.POST['service_term']
         service = snippet_utils.load_snippet_with_name(service_name)
         print(service)
         dynamic_form = self.generate_dynamic_form(service)
@@ -426,3 +435,20 @@ class DeleteVMView(TemplateView):
         context['results'] = res
 
         return context
+
+
+class TestCNCView(MSSPBaseAuth, CNCBaseFormView):
+    snippet = 'silver-new'
+    header = 'Configure Gold Service'
+    title = 'This is a title'
+    app_dir = 'mssp'
+
+    def form_valid(self, form):
+        results = dict()
+        if 'variables' in self.service:
+            for v in self.service['variables']:
+                results[v['name']] = self.request.POST[v['name']]
+
+        context = dict()
+        context['results'] = results
+        return render(self.request, 'mssp/results.html', context=context)

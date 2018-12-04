@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'mssp.apps.MSSPConfig'
+    'mssp.apps.MSSPConfig',
+    'pan_cnc.apps.PanCNCConfig'
 ]
 
 MIDDLEWARE = [
