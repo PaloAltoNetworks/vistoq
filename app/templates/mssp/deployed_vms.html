@@ -12,6 +12,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Hostname</th>
                 <th scope="col">Status</th>
+                <th scope="col">Options</th>
             </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@
                 <th scope="row">></th>
                 <td>{{ vm.hostname }}</td>
                 <td>{{ vm.status }}</td>
+                <td><a href="delete/{{ minion }}/{{ vm.hostname }}">Delete</a></td>
             </tr>
             {% endfor %}
             </tbody>
