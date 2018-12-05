@@ -1,8 +1,11 @@
-name: gpcs_core
-label: GPCS Core Creation
-description: GPCS Cloud Security Service
-type: gpcs
+name: addon-guest-zone
+label: AddOn Guest Zone
+description: Add Guest Zone for IG
+type: service
 extends:
+
+labels:
+  service_type: addon
 
 variables:
   - name: VPN_REMOTE_SITE
@@ -21,9 +24,6 @@ variables:
     description: Remote network local subnet
     default: 192.168.1.0/24
     type_hint: ip_address
-  - name: SIZING
-    description: Remote network service bandwidth
-    default: FWAAS-25Mbps
     type_hint: text
   - name: REMOTE_REGION
     description: GPCS tunnel connection location

@@ -43,7 +43,7 @@ class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
     Allows the user to choose which snippet to load
 
     """
-    snippet = 'service-picker'
+    snippet = 'cnc-conf'
     header = 'Provision Service'
     title = 'Configure Service Sales information'
     app_dir = 'mssp'
@@ -400,7 +400,7 @@ class GPCSView(MSSPBaseAuth, CNCBaseFormView):
     Allows the user to choose which snippet to load
 
     """
-    snippet = 'service-picker-gpcs'
+    snippet = 'cnc-conf-gpcs'
     header = 'Provision Service: GPCS'
     title = 'Configure Service Sales information: GPCS'
     app_dir = 'mssp'

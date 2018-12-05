@@ -1,11 +1,11 @@
-name: gpcs_remote
-label: GPCS Remote Network
-description: GPCS Cloud Security Service
+name: addon-dhcp-userid
+label: AddOn DHCP UserID
+description: UserID with DHCP Log Parsing
 type: service
 extends:
 
 labels:
-  service_type: gpcs
+  service_type: addon
 
 variables:
   - name: VPN_REMOTE_SITE

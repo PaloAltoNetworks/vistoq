@@ -1,11 +1,11 @@
-name: gpcs_remote
-label: GPCS Remote Network
-description: GPCS Cloud Security Service
+name: cloudconnect
+label: Public Cloud Connect
+description: Tunnel for Cloud Connect
 type: service
 extends:
 
 labels:
-  service_type: gpcs
+  service_type: refarch
 
 variables:
   - name: VPN_REMOTE_SITE

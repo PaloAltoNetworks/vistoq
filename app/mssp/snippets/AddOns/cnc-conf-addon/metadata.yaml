@@ -1,0 +1,22 @@
+name: cnc-conf-addon
+label: Service Picker Add-Ons
+description: Add-On service selection
+type: template
+extends:
+
+
+labels:
+  customize_field: service_tier
+  customize_label_name: service_type
+  customize_label_value: addon
+
+variables:
+
+  - name: service_tier
+    description: Service Tier
+    default: DHCP UserID
+    type_hint: text
+
+
+snippets:
+

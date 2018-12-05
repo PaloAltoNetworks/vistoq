@@ -1,0 +1,22 @@
+name: cnc-conf-refarch
+label: Service Picker Ref Arch
+description: Ref Arch service selection
+type: template
+extends:
+
+
+labels:
+  customize_field: service_tier
+  customize_label_name: service_type
+  customize_label_value: refarch
+
+variables:
+
+  - name: service_tier
+    description: Service Tier
+    default: cloudconnect
+    type_hint: text
+
+
+snippets:
+

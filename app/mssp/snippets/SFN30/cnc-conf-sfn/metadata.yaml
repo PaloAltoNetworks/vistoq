@@ -1,8 +1,15 @@
-name: service-picker-gpcs
-label: Service Picker GPCS
-description: GPCS service selection
+name: cnc-conf-sfn
+label: Service Picker SFN
+description: SFN service selection
 type: template
 extends:
+
+
+labels:
+  customize_field: service_tier
+  customize_label_name: service_type
+  customize_label_value: sfn
+
 variables:
   - name: customer_name
     description: Customer Name

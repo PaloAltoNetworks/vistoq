@@ -1,5 +1,5 @@
-name: gpcs_remote
-label: GPCS Remote Network
+name: gpcs_core
+label: GPCS Core Creation
 description: GPCS Cloud Security Service
 type: service
 extends:
@@ -24,6 +24,9 @@ variables:
     description: Remote network local subnet
     default: 192.168.1.0/24
     type_hint: ip_address
+  - name: SIZING
+    description: Remote network service bandwidth
+    default: FWAAS-25Mbps
     type_hint: text
   - name: REMOTE_REGION
     description: GPCS tunnel connection location

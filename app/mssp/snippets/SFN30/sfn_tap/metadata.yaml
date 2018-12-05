@@ -1,11 +1,11 @@
-name: gpcs_remote
-label: GPCS Remote Network
-description: GPCS Cloud Security Service
+name: sfn
+label: SFN - Tap Mode
+description: SFN Tap Mode NGFW
 type: service
 extends:
 
 labels:
-  service_type: gpcs
+  service_type: sfn
 
 variables:
   - name: VPN_REMOTE_SITE

@@ -3,6 +3,10 @@ label: Bronze
 description: Bronze Basic Security
 type: service
 extends: skillet_bronze
+
+labels:
+  service_type: internet_gateway
+
 variables:
   - name: FW_NAME
     description: Device Name
