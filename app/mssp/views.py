@@ -16,15 +16,13 @@ import json
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic import TemplateView, RedirectView
+from django.shortcuts import render, HttpResponseRedirect
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
-from mssp.forms import SimpleDemoForm
 from mssp.lib import pan_utils
 from mssp.lib import salt_utils
 from mssp.lib import snippet_utils
-
 from pan_cnc.views import CNCBaseFormView
 
 
@@ -55,7 +53,7 @@ class MSSPBaseFormView(FormView):
         return dynamic_form
 
 
-class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
+class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
     """
     /mssp/configure
 
@@ -64,9 +62,10 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
     Allows the user to choose which snippet to load
 
     """
-    template_name = 'mssp/simple_demo.html'
-    form_class = forms.Form
-    success_url = '/'
+    snippet = 'service-picker'
+    header = 'Provision Service'
+    title = 'Configure Service Sales information'
+    app_dir = 'mssp'
 
     def get_context_data(self, **kwargs):
         """
@@ -75,8 +74,10 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         :param kwargs:
         :return:
         """
-        form = self.get_form()
 
+        context = super().get_context_data(**kwargs)
+
+        form = context['form']
         # load all snippets with a type of 'service'
         services = snippet_utils.load_snippets_of_type('service')
 
@@ -94,23 +95,12 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         choices_set = tuple(choices_list)
         # make our new field
         new_choices_field = forms.ChoiceField(choices=choices_set)
-        form.fields['customer_name'] = forms.CharField(label='Customer Name', max_length=100)
-        form.fields['service_tier'] = new_choices_field
-
-        form.fields['platform_sizing'] = forms.ChoiceField(choices=(('small', 'Small'), ('medium', 'Medium'), ('large', 'Large')))
-        form.fields['service_term'] = forms.ChoiceField(choices=(('3', '3 Year'), ('2', '2 Year'), ('1', '1 Year')))
-
-        # save to kwargs and call parent for additional processing
         # set it on the original form, overwriting the hardcoded GSB version
-        form.fields['customer_name'] = forms.CharField(label='Customer Name', max_length=100)
+
         form.fields['service_tier'] = new_choices_field
 
-        form.fields['platform_sizing'] = forms.ChoiceField(choices=(('small', 'Small'), ('medium', 'Medium'), ('large', 'Large')))
-        form.fields['service_term'] = forms.ChoiceField(choices=(('3', '3 Year'), ('2', '2 Year'), ('1', '1 Year')))
-
-        # save to kwargs and call parent for additional processing
-        kwargs['form'] = form
-        return super().get_context_data(**kwargs)
+        context['form'] = form
+        return context
 
     def form_valid(self, form):
         """
@@ -118,31 +108,25 @@ class ConfigureServiceView(MSSPBaseAuth, MSSPBaseFormView):
         :param form: SimpleDemoForm
         :return: rendered html response
         """
-        # This method is called when valid form data has been POSTed.
-        # It should return an HttpResponse.
-        service_name = self.request.POST['service_tier']
-        customer_name = self.request.POST['customer_name']
-        service_term = self.request.POST['service_term']
-        service = snippet_utils.load_snippet_with_name(service_name)
-        print(service)
-        dynamic_form = self.generate_dynamic_form(service)
-        context = self.get_context_data()
-        context['customer_name'] = customer_name
-        context['service_term'] = service_term
-        context['service'] = service
-        context['form'] = dynamic_form
-        return render(self.request, 'mssp/configure_service.html', context=context)
+        return HttpResponseRedirect('provision')
 
 
-class ProvisionServiceView(MSSPBaseAuth, FormView):
+class ProvisionServiceView(MSSPBaseAuth, CNCBaseFormView):
     """
     Provision Service View - This view uses the Base Auth and Form View
     The posted view is actually a dynamically generated form so the forms.Form will actually be blank
     use form_valid as it will always be true in this case.
     """
-    template_name = 'mssp/simple_demo.html'
-    form_class = forms.Form
-    success_url = '/mssp/services'
+    snippet = ''
+    header = 'Provision Service'
+    title = 'Configure Service Sales information'
+    app_dir = 'mssp'
+
+    def get_snippet(self):
+        if self.app_dir in self.request.session:
+            session_cache = self.request.session[self.app_dir]
+            if 'service_tier' in session_cache:
+                return session_cache['service_tier']
 
     def form_valid(self, form):
         """
@@ -424,7 +408,6 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
 
 
 class DeleteVMView(TemplateView):
-
     template_name = 'mssp/results.html'
 
     def get_context_data(self, **kwargs):
