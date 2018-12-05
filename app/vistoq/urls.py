@@ -27,10 +27,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path, include
-from mssp.views import MSSPView, ConfigureServiceView, ProvisionServiceView
 from django.conf import settings
 from django.contrib.auth import views as auth_views
+from django.urls import path, include
+
+from mssp.views import MSSPView
 
 urlpatterns = [
     path('', MSSPView.as_view(), name='mssp'),
@@ -41,4 +42,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
     urlpatterns += staticfiles_urlpatterns()

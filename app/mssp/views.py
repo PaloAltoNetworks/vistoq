@@ -18,11 +18,10 @@ from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import TemplateView
-from django.views.generic.edit import FormView
 
-from mssp.lib import pan_utils
 from mssp.lib import salt_utils
-from mssp.lib import snippet_utils
+from pan_cnc.lib import pan_utils
+from pan_cnc.lib import snippet_utils
 from pan_cnc.views import CNCBaseFormView
 
 
@@ -33,24 +32,6 @@ class MSSPBaseAuth(LoginRequiredMixin):
 
 class MSSPView(MSSPBaseAuth, TemplateView):
     template_name = "mssp/index.html"
-
-
-class MSSPBaseFormView(FormView):
-    overrides = {}
-
-    @staticmethod
-    def generate_dynamic_form(service):
-        dynamic_form = forms.Form()
-        for variable in service['variables']:
-            print('Adding field %s' % variable['name'])
-            field_name = variable['name']
-            type_hint = variable['type_hint']
-            description = variable['description']
-            default = variable['default']
-            # FIXME - set form field type based on type_hint
-            dynamic_form.fields[field_name] = forms.CharField(label=description, initial=default)
-
-        return dynamic_form
 
 
 class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
@@ -79,7 +60,7 @@ class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
 
         form = context['form']
         # load all snippets with a type of 'service'
-        services = snippet_utils.load_snippets_of_type('service')
+        services = snippet_utils.load_snippets_of_type('service', self.app_dir)
 
         # we need to construct a new ChoiceField with the following basic format
         # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
@@ -123,10 +104,16 @@ class ProvisionServiceView(MSSPBaseAuth, CNCBaseFormView):
     app_dir = 'mssp'
 
     def get_snippet(self):
-        if self.app_dir in self.request.session:
+        if 'service_tier' in self.request.POST:
+            return self.request.POST['service_tier']
+
+        elif self.app_dir in self.request.session:
             session_cache = self.request.session[self.app_dir]
             if 'service_tier' in session_cache:
+                print('returning snippet name: %s' % session_cache['service_tier'])
                 return session_cache['service_tier']
+        else:
+            return self.snippet
 
     def form_valid(self, form):
         """
@@ -136,37 +123,26 @@ class ProvisionServiceView(MSSPBaseAuth, CNCBaseFormView):
         :param form: blank form data from request
         :return: render of a success template after service is provisioned
         """
-        service_name = self.request.POST.get('service_id', '')
-        customer_name = self.request.POST.get('customer_name', '')
+        service_name = self.get_value_from_workflow('service_tier', '')
 
         if service_name == '':
             # FIXME - add an ERROR page and message here
             print('No Service ID found!')
             return super().form_valid(form)
 
-        service = snippet_utils.load_snippet_with_name(service_name)
-        jinja_context = dict()
+        login = pan_utils.panorama_login()
+        if login is None:
+            context = dict()
+            context['error'] = 'Could not login to Panorama'
+            return render(self.request, 'mssp/error.html', context=context)
 
-        jinja_context['customer_name'] = customer_name
-        jinja_context['service_tier'] = service_name
-
-        for v in service['variables']:
-            if self.request.POST.get(v['name']):
-                jinja_context[v['name']] = self.request.POST.get(v['name'])
-            else:
-                # FIXME - add an ERROR page and message here
-                print('Required Variable not found on request!')
-                return super().form_valid(form)
-
-        # we now have a jinja context that contains all our variables and the user supplied inputs
-        # FIXME - add pan.xapi stuff here to handle this stuff!
-        print(jinja_context)
-
+        # let's grab the current workflow values (values saved from ALL forms in this app
+        jinja_context = self.get_workflow()
         # check if we need to ensure a baseline exists before hand
-        if 'extends' in service and service['extends'] is not None:
+        if 'extends' in self.service and self.service['extends'] is not None:
             # prego (it's in there)
-            baseline = service['extends']
-            baseline_service = snippet_utils.load_snippet_with_name(baseline)
+            baseline = self.service['extends']
+            baseline_service = snippet_utils.load_snippet_with_name(baseline, self.app_dir)
             # FIX for https://github.com/nembery/vistoq2/issues/5
             if 'variables' in baseline_service and type(baseline_service['variables']) is list:
                 for v in baseline_service['variables']:
@@ -185,8 +161,8 @@ class ProvisionServiceView(MSSPBaseAuth, CNCBaseFormView):
                     # make it prego
                     pan_utils.push_service(baseline_service, jinja_context)
 
-        # BUGFIX to always just push the toplevel service
-        pan_utils.push_service(service, jinja_context)
+        # BUG-FIX to always just push the toplevel self.service
+        pan_utils.push_service(self.service, jinja_context)
         # if not pan_utils.validate_snippet_present(service, jinja_context):
         #     print('Pushing new service: %s' % service['name'])
         #     pan_utils.push_service(service, jinja_context)
@@ -217,25 +193,7 @@ class ViewMinionsView(MSSPBaseAuth, TemplateView):
         return context
 
 
-class MSSPBaseDynamicFormView(MSSPBaseFormView):
-    form_class = forms.Form
-    template_name = 'mssp/dynamic_form.html'
-    success_url = '/mssp/results'
-    snippet = ''
-    header = 'Vistoq MSSP'
-    title = 'Deploy'
-    action = '/mssp/deploy'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        service = snippet_utils.load_snippet_with_name(self.snippet)
-        form = self.generate_dynamic_form(service)
-        context['form'] = form
-        context['header'] = self.header
-        return context
-
-
-class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
+class DeployServiceView(MSSPBaseAuth, CNCBaseFormView):
     template_name = 'mssp/deploy_service.html'
     snippet = 'provision_firewall'
 
@@ -278,7 +236,7 @@ class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
     def form_valid(self, form):
         print('Here we go deploying')
         jinja_context = dict()
-        service = snippet_utils.load_snippet_with_name('provision_firewall')
+        service = snippet_utils.load_snippet_with_name('provision_firewall', self.app_dir)
 
         for v in service['variables']:
             if self.request.POST.get(v['name']):
@@ -314,7 +272,7 @@ class DeployServiceView(MSSPBaseAuth, MSSPBaseDynamicFormView):
         return render(self.request, 'mssp/results.html', context=context)
 
 
-class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
+class ViewDeployedVmsView(MSSPBaseAuth, CNCBaseFormView):
     """
     Show all the VMs currently deployed on the compute node
 
@@ -365,16 +323,9 @@ class ViewDeployedVmsView(MSSPBaseAuth, MSSPBaseDynamicFormView):
 
     def form_valid(self, form):
         print('Here we go deploying')
-        jinja_context = dict()
-        service = snippet_utils.load_snippet_with_name(self.snippet)
-
-        for v in service['variables']:
-            if self.request.POST.get(v['name']):
-                jinja_context[v['name']] = self.request.POST.get(v['name'])
-
-        minion = self.request.POST.get('minion')
+        minion = self.get_value_from_workflow('minion', '')
         salt_util = salt_utils.SaltUtil()
-        res = salt_util.deploy_service(service, jinja_context)
+        res = salt_util.deploy_service(self.service, self.get_workflow())
         context = dict()
 
         try:
@@ -413,7 +364,7 @@ class DeleteVMView(TemplateView):
     def get_context_data(self, **kwargs):
         hostname = self.kwargs['hostname']
         minion = self.kwargs['minion']
-        service = snippet_utils.load_snippet_with_name('delete_single_vm')
+        service = snippet_utils.load_snippet_with_name('delete_single_vm', self.app_dir)
         jinja_context = dict()
         for v in service['variables']:
             if kwargs.get(v['name']):
@@ -427,58 +378,6 @@ class DeleteVMView(TemplateView):
         context['results'] = res
 
         return context
-
-
-class TestCNCView(MSSPBaseAuth, CNCBaseFormView):
-    snippet = 'service-picker'
-    header = 'Provision Service'
-    title = 'Configure Service Sales information'
-    app_dir = 'mssp'
-
-    def get_context_data(self, **kwargs):
-        """
-        Override get_context_data so we can modify the SimpleDemoForm as necessary.
-        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
-        :param kwargs:
-        :return:
-        """
-
-        context = super().get_context_data(**kwargs)
-
-        form = context['form']
-        # load all snippets with a type of 'service'
-        services = snippet_utils.load_snippets_of_type('service')
-
-        # we need to construct a new ChoiceField with the following basic format
-        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
-        choices_list = list()
-        # grab each service and construct a simple tuple with name and label, append to the list
-        for service in services:
-            choice = (service['name'], service['label'])
-            choices_list.append(choice)
-
-        # let's sort the list by the label attribute (index 1 in the tuple)
-        choices_list = sorted(choices_list, key=lambda k: k[1])
-        # convert our list of tuples into a tuple itself
-        choices_set = tuple(choices_list)
-        # make our new field
-        new_choices_field = forms.ChoiceField(choices=choices_set)
-        # set it on the original form, overwriting the hardcoded GSB version
-
-        form.fields['service_tier'] = new_choices_field
-
-        context['form'] = form
-        return context
-
-    def form_valid(self, form):
-        results = dict()
-        if 'variables' in self.service:
-            for v in self.service['variables']:
-                results[v['name']] = self.request.POST[v['name']]
-
-        context = dict()
-        context['results'] = results
-        return render(self.request, 'mssp/results.html', context=context)
 
 
 class GPCSView(MSSPBaseAuth, CNCBaseFormView):
@@ -537,3 +436,4 @@ class GPCSView(MSSPBaseAuth, CNCBaseFormView):
         :return: rendered html response
         """
         return HttpResponseRedirect('provision')
+
