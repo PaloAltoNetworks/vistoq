@@ -80,13 +80,13 @@ class ChooseSnippetView(MSSPBaseAuth, CNCBaseFormView):
                 label_value = labels['customize_label_value']
                 services = snippet_utils.load_snippets_by_label(label_name, label_value, self.app_dir)
         else:
-            custom_field = 'service_tier'
+            custom_field = 'snippet_name'
             services = snippet_utils.load_snippets_of_type('service', self.app_dir)
 
         form = context['form']
 
         # we need to construct a new ChoiceField with the following basic format
-        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        # snippet_name = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
         choices_list = list()
         # grab each service and construct a simple tuple with name and label, append to the list
         for service in services:
@@ -127,14 +127,14 @@ class ProvisionSnippetView(MSSPBaseAuth, CNCBaseFormView):
     app_dir = 'mssp'
 
     def get_snippet(self):
-        if 'service_tier' in self.request.POST:
-            return self.request.POST['service_tier']
+        if 'snippet_name' in self.request.POST:
+            return self.request.POST['snippet_name']
 
         elif self.app_dir in self.request.session:
             session_cache = self.request.session[self.app_dir]
-            if 'service_tier' in session_cache:
-                print('returning snippet name: %s' % session_cache['service_tier'])
-                return session_cache['service_tier']
+            if 'snippet_name' in session_cache:
+                print('returning snippet name: %s' % session_cache['snippet_name'])
+                return session_cache['snippet_name']
         else:
             return self.snippet
 
@@ -146,7 +146,7 @@ class ProvisionSnippetView(MSSPBaseAuth, CNCBaseFormView):
         :param form: blank form data from request
         :return: render of a success template after service is provisioned
         """
-        service_name = self.get_value_from_workflow('service_tier', '')
+        service_name = self.get_value_from_workflow('snippet_name', '')
 
         if service_name == '':
             # FIXME - add an ERROR page and message here
@@ -236,7 +236,7 @@ class DeployServiceView(MSSPBaseAuth, CNCBaseFormView):
         minion_list = salt_util.get_minion_list()
 
         # we need to construct a new ChoiceField with the following basic format
-        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        # snippet_name = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
         choices_list = list()
         # grab each service and construct a simple tuple with name and label, append to the list
         for minion in minion_list:
@@ -324,7 +324,7 @@ class ViewDeployedVmsView(MSSPBaseAuth, CNCBaseFormView):
         minion_list = salt_util.get_minion_list()
 
         # we need to construct a new ChoiceField with the following basic format
-        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        # snippet_name = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
         choices_list = list()
         # grab each service and construct a simple tuple with name and label, append to the list
         for minion in minion_list:
