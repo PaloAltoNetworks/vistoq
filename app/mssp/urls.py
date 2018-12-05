@@ -27,4 +27,5 @@ urlpatterns = [
     path('configure', ConfigureServiceView.as_view()),
     path('provision', ProvisionServiceView.as_view()),
     path('test', TestCNCView.as_view()),
+    path('gpcs', GPCSView.as_view()),
 ]

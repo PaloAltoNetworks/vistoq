@@ -479,3 +479,61 @@ class TestCNCView(MSSPBaseAuth, CNCBaseFormView):
         context = dict()
         context['results'] = results
         return render(self.request, 'mssp/results.html', context=context)
+
+
+class GPCSView(MSSPBaseAuth, CNCBaseFormView):
+    """
+    /mssp/configure
+
+    This will instantiate the SimpleDemoForm from forms.py
+
+    Allows the user to choose which snippet to load
+
+    """
+    snippet = 'service-picker-gpcs'
+    header = 'Provision Service: GPCS'
+    title = 'Configure Service Sales information: GPCS'
+    app_dir = 'mssp'
+
+    def get_context_data(self, **kwargs):
+        """
+        Override get_context_data so we can modify the SimpleDemoForm as necessary.
+        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        :param kwargs:
+        :return:
+        """
+
+        context = super().get_context_data(**kwargs)
+
+        form = context['form']
+        # load all snippets with a type of 'service'
+        services = snippet_utils.load_snippets_of_type('gpcs')
+
+        # we need to construct a new ChoiceField with the following basic format
+        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        choices_list = list()
+        # grab each service and construct a simple tuple with name and label, append to the list
+        for service in services:
+            choice = (service['name'], service['label'])
+            choices_list.append(choice)
+
+        # let's sort the list by the label attribute (index 1 in the tuple)
+        choices_list = sorted(choices_list, key=lambda k: k[1])
+        # convert our list of tuples into a tuple itself
+        choices_set = tuple(choices_list)
+        # make our new field
+        new_choices_field = forms.ChoiceField(choices=choices_set)
+        # set it on the original form, overwriting the hardcoded GSB version
+
+        form.fields['service_tier'] = new_choices_field
+
+        context['form'] = form
+        return context
+
+    def form_valid(self, form):
+        """
+        Called when the simple demo form is submitted
+        :param form: SimpleDemoForm
+        :return: rendered html response
+        """
+        return HttpResponseRedirect('provision')

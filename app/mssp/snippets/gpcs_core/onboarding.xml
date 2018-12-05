@@ -1,0 +1,9 @@
+ <entry name="{{ VPN_REMOTE_SITE }}">
+ 	<subnets>
+	  <member>{{ VPN_REMOTE_NETWORK }}</member>
+	</subnets>
+	<license-type>{{ SIZING }}</license-type>
+	<ipsec-tunnel>{{ VPN_REMOTE_SITE }}</ipsec-tunnel>
+	<region>{{ REMOTE_REGION }}</region>
+	<secondary-wan-enabled>no</secondary-wan-enabled>
+</entry>
