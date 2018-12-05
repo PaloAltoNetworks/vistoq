@@ -25,6 +25,5 @@ urlpatterns = [
     path('results', TemplateView.as_view()),
     path('vms', ViewDeployedVmsView.as_view()),
     path('configure', ConfigureServiceView.as_view()),
-    path('provision', ProvisionServiceView.as_view()),
-    path('test', TestCNCView.as_view()),
+    path('provision', ProvisionServiceView.as_view())
 ]
