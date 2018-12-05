@@ -3,6 +3,11 @@ label: Silverish
 description: Silver Advanced Security
 type: service
 extends: skillet_silver
+
+labels:
+  group: panorama
+  panorama_version: 8.1
+
 variables:
   - name: FW_NAME
     description: Device Name

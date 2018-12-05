@@ -58,9 +58,20 @@ class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
 
         context = super().get_context_data(**kwargs)
 
+        if 'labels' in self.service and 'customize_field' in self.service['labels']:
+                labels = self.service['labels']
+                if not {'customize_label_name', 'customize_label_value'}.issubset(labels):
+                    print('Malformed Configure Service Picker!')
+
+                custom_field = labels['customize_field']
+                label_name = labels['customize_label_name']
+                label_value = labels['customize_label_value']
+                services = snippet_utils.load_snippets_by_label(label_name, label_value, self.app_dir)
+        else:
+            custom_field = 'service_tier'
+            services = snippet_utils.load_snippets_of_type('service', self.app_dir)
+
         form = context['form']
-        # load all snippets with a type of 'service'
-        services = snippet_utils.load_snippets_of_type('service', self.app_dir)
 
         # we need to construct a new ChoiceField with the following basic format
         # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
@@ -78,7 +89,7 @@ class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
         new_choices_field = forms.ChoiceField(choices=choices_set)
         # set it on the original form, overwriting the hardcoded GSB version
 
-        form.fields['service_tier'] = new_choices_field
+        form.fields[custom_field] = new_choices_field
 
         context['form'] = form
         return context
