@@ -2,6 +2,12 @@ name: service-picker
 label: Service Picker
 description: Silver Advanced Security
 type: template
+
+labels:
+  customize_field: service_tier
+  customize_label_name: service_type
+  customize_label_value: internet_gateway
+
 extends:
 variables:
   - name: customer_name

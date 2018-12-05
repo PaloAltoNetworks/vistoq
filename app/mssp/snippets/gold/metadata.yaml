@@ -4,6 +4,9 @@ description: Gold Advanced Security
 type: service
 extends: skillet_gold
 
+labels:
+  service_type: internet_gateway
+
 variables:
   - name: FW_NAME
     description: Device Name
