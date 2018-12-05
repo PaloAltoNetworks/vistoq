@@ -24,6 +24,6 @@ urlpatterns = [
     path('delete/<minion>/<hostname>', DeleteVMView.as_view()),
     path('results', TemplateView.as_view()),
     path('vms', ViewDeployedVmsView.as_view()),
-    path('configure', ConfigureServiceView.as_view()),
-    path('provision', ProvisionServiceView.as_view())
+    path('configure', ChooseSnippetView.as_view()),
+    path('provision', ProvisionSnippetView.as_view())
 ]

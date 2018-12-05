@@ -34,13 +34,25 @@ class MSSPView(MSSPBaseAuth, TemplateView):
     template_name = "mssp/index.html"
 
 
-class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
+class ChooseSnippetView(MSSPBaseAuth, CNCBaseFormView):
     """
     /mssp/configure
 
-    This will instantiate the SimpleDemoForm from forms.py
+    Allows the user to choose which snippet to load, configure, and provision based on a dropdown list of snippets
+    with a certain label
 
-    Allows the user to choose which snippet to load
+    The fields to configure are defined in the snippet given in the 'snippet' attribute
+
+    The list of snippets to choose from are defined by the 'customize_field', 'customize_label_name' and
+    'customize_label_value' labels on the snippet YAML.
+
+    For example: To present a list of snippets to configure user-id on panorama
+            1. create the initial configuration snippet with whatever values we need there
+            2. add the required labels: customize_field, customize_label_name, customize_label_value
+            3. Add at least one configuration snippet with the appropriate label
+            4. Create a URL entry in urls.py
+                        path('configure', ChooseSnippetView.as_view(snippet='user_id_config)),
+            5. Optional - add a menu entry in the templates/mssp/base.html file
 
     """
     snippet = 'service-picker'
@@ -103,7 +115,7 @@ class ConfigureServiceView(MSSPBaseAuth, CNCBaseFormView):
         return HttpResponseRedirect('provision')
 
 
-class ProvisionServiceView(MSSPBaseAuth, CNCBaseFormView):
+class ProvisionSnippetView(MSSPBaseAuth, CNCBaseFormView):
     """
     Provision Service View - This view uses the Base Auth and Form View
     The posted view is actually a dynamically generated form so the forms.Form will actually be blank
