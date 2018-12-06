@@ -13,7 +13,83 @@ variables:
   - name: customer_name
     description: Customer Name
     default: ACME
-    type_hint: text
+    type_hint: dropdown
+    dd_list:
+      - key: PAN-A7-40646123 - Cara S. Mcintosh
+        value: PAN-A7-40646123
+      - key: PAN-A8-89390058 - Carter Hawkins
+        value: PAN-A8-89390058
+      - key: PAN-A7-34061387 - Ella V. Durham
+        value: PAN-A7-34061387
+      - key: PAN-A9-42896926 - Jaden Hubbard
+        value: PAN-A9-42896926
+      - key: PAN-A8-08492225 - Cadman D. Blanchard
+        value: PAN-A8-08492225
+      - key: PAN-A8-99098632 - Ebony B. Bray
+        value: PAN-A8-99098632
+      - key: PAN-B8-62338140 - Kiayada Petty
+        value: PAN-B8-62338140
+      - key: PAN-B8-69287367 - Maxwell K. Guerrero
+        value: PAN-B8-69287367
+      - key: PAN-B8-39292461 - Sonya C. Griffin
+        value: PAN-B8-39292461
+      - key: PAN-C9-02071901 - Linus W. Walker
+        value: PAN-C9-02071901
+      - key: PAN-A8-01344462 - Moses W. Macdonald
+        value: PAN-A8-01344462
+      - key: PAN-C8-46260965 - Nicole Z. Mccarty
+        value: PAN-C8-46260965
+      - key: PAN-B7-32499948 - Oren Q. Lang
+        value: PAN-B7-32499948
+      - key: PAN-B9-13021868 - Salvador S. Terrell
+        value: PAN-B9-13021868
+      - key: PAN-B8-13556297 - Phillip Y. Herrera
+        value: PAN-B8-13556297
+      - key: PAN-B9-95568289 - Zachery O. Higgins
+        value: PAN-B9-95568289
+      - key: PAN-C8-96821900 - Violet H. Delgado
+        value: PAN-C8-96821900
+      - key: PAN-C7-23563677 - Hilda D. Mcintyre
+        value: PAN-C7-23563677
+      - key: PAN-B7-96078745 - Jordan U. Hurst
+        value: PAN-B7-96078745
+      - key: PAN-B7-88167376 - Graiden O. Mooney
+        value: PAN-B7-88167376
+      - key: PAN-C8-46223691 - Ryder L. Walls
+        value: PAN-C8-46223691
+      - key: PAN-B9-53527769 - Baker O. Carter
+        value: PAN-B9-53527769
+      - key: PAN-C8-74382848 - Kay L. Cotton
+        value: PAN-C8-74382848
+      - key: PAN-B9-31202220 - Elizabeth L. Schroeder
+        value: PAN-B9-31202220
+      - key: PAN-A7-33556072 - Linus K. Perkins
+        value: PAN-A7-33556072
+      - key: PAN-C9-07837716 - Idola B. Silva
+        value: PAN-C9-07837716
+      - key: PAN-C7-35769953 - Charlotte V. Parks
+        value: PAN-C7-35769953
+      - key: PAN-A9-51758715 - Judith N. Vargas
+        value: PAN-A9-51758715
+      - key: PAN-A9-41994044 - Russell Z. Marshall
+        value: PAN-A9-41994044
+      - key: PAN-A7-30853256 - Lana K. Mcgee
+        value: PAN-A7-30853256
+      - key: PAN-B8-06136339 - Graham J. Crane
+        value: PAN-B8-06136339
+      - key: PAN-B9-58226884 - Delilah Z. Chang
+        value: PAN-B9-58226884
+      - key: PAN-C7-47833282 - Maggie Y. Banks
+        value: PAN-C7-47833282
+      - key: PAN-B7-09925358 - Cain B. Roman
+        value: PAN-B7-09925358
+      - key: PAN-B8-49114938 - Heather W. Finch
+        value: PAN-B8-49114938
+      - key: PAN-B7-71436677 - Clark P. Cummings
+        value: PAN-B7-71436677
+      - key: PAN-B8-83246100 - Jameson B. Ratliff
+        value: PAN-B8-83246100
+
   - name: snippet_name
     description: Service Tier
     default: Gold
