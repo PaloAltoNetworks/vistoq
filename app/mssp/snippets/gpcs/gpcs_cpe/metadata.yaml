@@ -1,0 +1,47 @@
+name: gpcs_cpe
+label: GPCS CPE Config
+description: GPCS Cloud Security Service
+type: service
+extends:
+
+labels:
+  service_type: gpcs
+
+variables:
+  - name: VPN_REMOTE_SITE
+    description: Name of remote branch site
+    default: RemoteSite
+    type_hint: text
+  - name: CPE_TYPE
+    description: CPE Type
+    default: Palo Alto Networks
+    type_hint: dropdown
+    dd_list:
+      - key: Palo Alto Networks
+        value: panw
+      - key: Cisco Systems
+        value: csco
+      - key: Velo Cloud
+        value: velo
+      - key: Viptela
+        value: viptela
+  - name: VPN_SVC_IP
+    description: GPCS Site IP address
+    default: 192.168.0.1
+    type_hint: ip_address
+  - name: VPN_SHARED_KEY
+    description: IKE gateway shared key
+    default: paloalto
+    type_hint: text
+
+
+snippets:
+  - name: ike_gateway
+    xpath: /config/devices/entry[@name='localhost.localdomain']/template/entry[@name='{{ REMOTE_NETWORK_TEMPLATE }}']/config/devices/entry[@name='localhost.localdomain']/network/ike
+    file: ike_gateway.xml
+  - name: ipsec_tunnel
+    xpath: /config/devices/entry[@name='localhost.localdomain']/template/entry[@name='{{ REMOTE_NETWORK_TEMPLATE }}']/config/devices/entry[@name='localhost.localdomain']/network/tunnel
+    file: ipsec_tunnel.xml
+  - name: onboarding
+    xpath: /config/devices/entry[@name='localhost.localdomain']/plugins/cloud_services/remote-networks/onboarding
+    file: onboarding.xml
