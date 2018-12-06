@@ -8,7 +8,6 @@
     <tunnel-monitor>
       <enable>yes</enable>
       <destination-ip>{{ VPN_PEER_IP }}</destination-ip>
-      <tunnel-monitor-profile>default</tunnel-monitor-profile>
     </tunnel-monitor>
     <tunnel-interface>tunnel</tunnel-interface>
   </entry>
