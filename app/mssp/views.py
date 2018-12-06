@@ -432,7 +432,7 @@ class GPCSView(MSSPBaseAuth, CNCBaseFormView):
         services = snippet_utils.load_snippets_of_type('gpcs')
 
         # we need to construct a new ChoiceField with the following basic format
-        # service_tier = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
+        # snippet_name = forms.ChoiceField(choices=(('gold', 'Gold'), ('silver', 'Silver'), ('bronze', 'Bronze')))
         choices_list = list()
         # grab each service and construct a simple tuple with name and label, append to the list
         for service in services:
@@ -447,7 +447,7 @@ class GPCSView(MSSPBaseAuth, CNCBaseFormView):
         new_choices_field = forms.ChoiceField(choices=choices_set)
         # set it on the original form, overwriting the hardcoded GSB version
 
-        form.fields['service_tier'] = new_choices_field
+        form.fields['snippet_name'] = new_choices_field
 
         context['form'] = form
         return context

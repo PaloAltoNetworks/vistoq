@@ -6,7 +6,7 @@ extends:
 
 
 labels:
-  customize_field: service_tier
+  customize_field: snippet_name
   customize_label_name: service_type
   customize_label_value: gpcs
 
@@ -15,7 +15,7 @@ variables:
     description: Customer Name
     default: ACME
     type_hint: text
-  - name: service_tier
+  - name: snippet_name
     description: Service Tier
     default: GPCS Remote Network
     type_hint: text
