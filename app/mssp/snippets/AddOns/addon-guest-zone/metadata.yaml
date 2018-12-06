@@ -1,5 +1,5 @@
 name: addon-guest-zone
-label: AddOn Guest Zone
+label: Guest Zone
 description: Add Guest Zone for IG
 type: service
 extends:
