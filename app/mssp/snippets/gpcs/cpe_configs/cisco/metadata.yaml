@@ -1,0 +1,93 @@
+name: cisco
+label: Cisco CPE GPCS Config
+description: CPE config for Cisco
+type: template
+extends:
+
+labels:
+  service_type: gpcs-cpe
+
+
+variables:
+- name: primary_vpn_ip
+  description: Service IP Address
+  default: primary_vpn_ip
+  type_hint: text
+- name: backup_tunnel_interface
+  description: Backup Tunnel Interface
+  default: backup_tunnel_interface
+  type_hint: text
+- name: ike_profile_2_name
+  description: Ike Profile 2 Name
+  default: ike_profile_2_name
+  type_hint: text
+- name: backup_vpn_ip
+  description: Backup Vpn Ip
+  default: backup_vpn_ip
+  type_hint: text
+- name: peer_1_name
+  description: Peer 1 Name
+  default: peer_1_name
+  type_hint: text
+- name: fqdn
+  description: Fqdn
+  default: fqdn
+  type_hint: text
+- name: ipsec_profile_2_name
+  description: Ipsec Profile 2 Name
+  default: ipsec_profile_2_name
+  type_hint: text
+- name: acl_number
+  description: Acl Number
+  default: acl_number
+  type_hint: text
+- name: key_ring_name
+  description: Key Ring Name
+  default: key_ring_name
+  type_hint: text
+- name: ike_profile_1_name
+  description: Ike Profile 1 Name
+  default: ike_profile_1_name
+  type_hint: text
+- name: transform_set_name
+  description: Transform Set Name
+  default: transform_set_name
+  type_hint: text
+- name: proposal_name
+  description: Proposal Name
+  default: proposal_name
+  type_hint: text
+- name: primary_tunnel_interface
+  description: Primary Tunnel Interface
+  default: primary_tunnel_interface
+  type_hint: text
+- name: wan_interfafce
+  description: Wan Interfafce
+  default: wan_interfafce
+  type_hint: text
+- name: route_map_name
+  description: Route Map Name
+  default: route_map_name
+  type_hint: text
+- name: policy_name
+  description: Policy Name
+  default: policy_name
+  type_hint: text
+- name: mtu
+  description: Mtu
+  default: mtu
+  type_hint: text
+- name: preshared_key
+  description: Preshared Key
+  default: preshared_key
+  type_hint: text
+- name: ipsec_profile_1_name
+  description: Ipsec Profile 1 Name
+  default: ipsec_profile_1_name
+  type_hint: text
+
+snippets:
+- name: cisco_ike.conf
+  file: cisco_ike.conf
+
+

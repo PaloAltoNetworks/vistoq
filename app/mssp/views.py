@@ -153,6 +153,12 @@ class ProvisionSnippetView(MSSPBaseAuth, CNCBaseFormView):
             print('No Service ID found!')
             return super().form_valid(form)
 
+        if self.service['type'] == 'template':
+            template = snippet_utils.render_snippet_template(self.service, self.app_dir, self.get_workflow())
+            context = dict()
+            context['results'] = template
+            return render(self.request, 'mssp/results.html', context)
+
         login = pan_utils.panorama_login()
         if login is None:
             context = dict()
