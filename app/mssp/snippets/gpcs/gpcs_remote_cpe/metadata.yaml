@@ -1,0 +1,24 @@
+name: cnc-conf-gpcs-remote
+label: CNC Config for GPCS Remote CPE
+description: GPCS Remote CPE Configuration
+type: template
+extends:
+
+labels:
+  customize_field: snippet_name
+  customize_label_name: service_type
+  customize_label_value: gpcs-cpe
+
+variables:
+  - name: customer_name
+    description: Customer Name
+    default: ACME
+    type_hint: text
+  - name: snippet_name
+    description: CPE Vendor
+    default: junos
+    type_hint: text
+
+
+snippets:
+

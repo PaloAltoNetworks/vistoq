@@ -1,50 +1,73 @@
-name: gpcs_core
-label: GPCS Core Creation
-description: GPCS Cloud Security Service
-type: service
+name: junos
+label: Junos CPE GPCS Config
+description: CPE config for Junos 11.4 or greater
+type: template
 extends:
 
 labels:
-  service_type: gpcs
+  service_type: gpcs-cpe
 
 variables:
-  - name: VPN_REMOTE_SITE
-    description: Name of remote branch site
-    default: RemoteSite
-    type_hint: text
-  - name: VPN_SHARED_KEY
-    description: IKE gateway shared key
-    default: paloalto
-    type_hint: text
-  - name: VPN_PEER_IP
-    description: Remote Site IP address
-    default: 192.168.0.1
-    type_hint: ip_address
-  - name: VPN_REMOTE_NETWORK
-    description: Remote network local subnet
-    default: 192.168.1.0/24
-    type_hint: ip_address
-  - name: SIZING
-    description: Remote network service bandwidth
-    default: FWAAS-25Mbps
-    type_hint: text
-  - name: REMOTE_REGION
-    description: GPCS tunnel connection location
-    default: us-east-1
-    type_hint: text
-  - name: REMOTE_NETWORK_TEMPLATE
-    description: template name for GPCS plugin
-    default: Remote_Network_Template
-    type_hint: text
+- name: primary_vip_address
+  description: Service IP Address
+  default: primary_vip_address
+  type_hint: text
+- name: ike_proposal_name
+  description: Ike Proposal Name
+  default: ike_proposal_name
+  type_hint: text
+- name: backup_ike_gateway
+  description: Backup Ike Gateway
+  default: backup_ike_gateway
+  type_hint: text
+- name: fqdn
+  description: Fqdn
+  default: fqdn
+  type_hint: text
+- name: backup_ipsec_vpn_name
+  description: Backup Ipsec Vpn Name
+  default: backup_ipsec_vpn_name
+  type_hint: text
+- name: ipsec_proposal_name
+  description: Ipsec Proposal Name
+  default: ipsec_proposal_name
+  type_hint: text
+- name: ike_policy_name
+  description: Ike Policy Name
+  default: ike_policy_name
+  type_hint: text
+- name: ipsec_policy_name
+  description: Ipsec Policy Name
+  default: ipsec_policy_name
+  type_hint: text
+- name: nat_rule_set_name
+  description: Nat Rule Set Name
+  default: nat_rule_set_name
+  type_hint: text
+- name: nat_rule_name
+  description: Nat Rule Name
+  default: nat_rule_name
+  type_hint: text
+- name: primary_ike_gateway
+  description: Primary Ike Gateway
+  default: primary_ike_gateway
+  type_hint: text
+- name: backup_vip_address
+  description: Backup Vip Address
+  default: backup_vip_address
+  type_hint: text
+- name: preshared_key
+  description: Preshared Key
+  default: preshared_key
+  type_hint: text
 
+- name: primary_ipsec_vpn_name
+  description: Primary Ipsec Vpn Name
+  default: primary_ipsec_vpn_name
+  type_hint: text
 
 snippets:
-  - name: ike_gateway
-    xpath: /config/devices/entry[@name='localhost.localdomain']/template/entry[@name='{{ REMOTE_NETWORK_TEMPLATE }}']/config/devices/entry[@name='localhost.localdomain']/network/ike
-    file: ike_gateway.xml
-  - name: ipsec_tunnel
-    xpath: /config/devices/entry[@name='localhost.localdomain']/template/entry[@name='{{ REMOTE_NETWORK_TEMPLATE }}']/config/devices/entry[@name='localhost.localdomain']/network/tunnel
-    file: ipsec_tunnel.xml
-  - name: onboarding
-    xpath: /config/devices/entry[@name='localhost.localdomain']/plugins/cloud_services/remote-networks/onboarding
-    file: onboarding.xml
+- name: junos_ike.conf
+  file: junos_ike.conf
+
+
