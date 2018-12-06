@@ -11,36 +11,15 @@ labels:
   customize_label_value: sfn
 
 variables:
-  - name: customer_name
-    description: Customer Name
-    default: ACME
+  - name: FW_NAME
+    description: Device Name
+    default: SFN_NGFW
     type_hint: text
   - name: service_tier
-    description: Service Tier
-    default: GPCS Remote Network
+    description: Deployment Type
+    default: SFN - Tap Mode
     type_hint: text
-  - name: service_size
-    description: Service Size
-    default: Small
-    type_hint: dropdown
-    dd_list:
-      - key: 00 No Bandwidth
-        value: 00-core
-      - key: 10 Mbps
-        value: FWaaS-10Mbps
-      - key: 25 Mbps
-        value: FWaaS-10Mbps
-      - key: 100 Mbps
-        value: FWaaS-10Mbps
-  - name: service_term
-    description: Service Term
-    default: 3 year
-    type_hint: dropdown
-    dd_list:
-      - key: 3 Year
-        value: 3
-      - key: 1 Year
-        value: 1
+
 
 
 snippets:
