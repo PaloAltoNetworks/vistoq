@@ -6,7 +6,7 @@ extends:
 
 
 labels:
-  customize_field: service_tier
+  customize_field: snippet_name
   customize_label_name: service_type
   customize_label_value: sfn
 
