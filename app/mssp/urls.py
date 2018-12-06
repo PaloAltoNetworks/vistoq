@@ -25,9 +25,9 @@ urlpatterns = [
     path('results', TemplateView.as_view()),
     path('vms', ViewDeployedVmsView.as_view()),
     path('configure', ChooseSnippetView.as_view()),
-    path('provision', ProvisionSnippetView.as_view())
-    path('gpcs', ConfigureServiceView.as_view(snippet='cnc-conf-gpcs')),
-    path('sfn', ConfigureServiceView.as_view(snippet='cnc-conf-sfn')),
-    path('addon', ConfigureServiceView.as_view(snippet='cnc-conf-addon')),
-    path('refarch', ConfigureServiceView.as_view(snippet='cnc-conf-refarch')),
+    path('provision', ProvisionSnippetView.as_view()),
+    path('gpcs', ChooseSnippetView.as_view(snippet='cnc-conf-gpcs')),
+    path('sfn', ChooseSnippetView.as_view(snippet='cnc-conf-sfn')),
+    path('addon', ChooseSnippetView.as_view(snippet='cnc-conf-addon')),
+    path('refarch', ChooseSnippetView.as_view(snippet='cnc-conf-refarch')),
 ]
