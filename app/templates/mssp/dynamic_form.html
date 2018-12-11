@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block content %}
-
+WHAT THE FUCK
     <div class="card border-primary mb-6">
-        <div class="card-header text-white bg-primary">{{ header }}</div>
+        <h1 class="page-title">{{ title }}</h1>
+        <!--<div class="card-header text-white bg-primary">{{ header }}</div>-->
         <div class="card-body">
-            <h4 class="card-title">{{ title }}</h4>
+
             <p class="card-text">
             <form action="{{ action }}" method="post">
                 {% csrf_token %}

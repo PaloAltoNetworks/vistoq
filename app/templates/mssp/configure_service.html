@@ -4,9 +4,10 @@
 {% block content %}
 
     <div class="card border-primary mb-6">
-        <div class="card-header text-white bg-primary">Configure Security Service</div>
+        <h1 class="page-title">{{ title }}</h1>
+        <!--<div class="card-header text-white bg-primary">Configure Security Service</div>-->
         <div class="card-body">
-            <h4 class="card-title">Service Type Specific Information</h4>
+            <!--<h4 class="card-title">Service Type Specific Information</h4>-->
             <p class="card-text">
             <form action="/mssp/provision" method="post">
                 {% csrf_token %}
