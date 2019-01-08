@@ -1,3 +1,4 @@
-[submodule "app/pan_cnc"]
-	path = app/pan_cnc
-	url = https://github.com/nembery/django-pan-cnc
+[submodule "app/cnc"]
+	path = app/cnc
+	url = git@github.com:PaloAltoNetworks/pan-cnc.git
+	branch = develop

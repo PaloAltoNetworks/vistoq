@@ -1,0 +1,16 @@
+name: show_deployed_vms_on_node
+label: Show VMs on Node
+description: some stuff here
+type: template
+extends:
+variables:
+  - name: minion
+    description: Node
+    default: compute-01.c.vistoq-demo.internal
+    type_hint: text
+
+snippets:
+  - name: vm_status
+    file: vm_status.j2
+
+

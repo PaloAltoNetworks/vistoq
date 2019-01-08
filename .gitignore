@@ -1,5 +1,7 @@
 .idea
 venv
+!snippets/app/
+snippets/
 __pycache__
 *pyc
 app/db.sqlite3

@@ -1,0 +1,36 @@
+name: vistoq
+
+repositories:
+  - name: Iron-Skillet
+    url: https://github.com/PaloAltoNetworks/iron-skillet.git
+    branch: 81dev
+    destination_directory: iron-skillet-81dev
+  - name: MSSP Templates
+    url:  https://github.com/scotchoaf/mssp-templates.git
+    branch: 81dev
+    destination_directory: gsb81
+
+views:
+  - name: ''
+    class: CNCView
+#    menu: Vistoq
+#    menu_option: Welcome
+    attributes:
+      template_name: pan_cnc/welcome.html
+    context:
+      title: Vistoq
+      description: Welcome to the Vistoq Security Operations Portal
+      documentation_link: http://vistoq.readthedocs.io
+      next: configure
+
+  - name: configure
+    class: ChooseSnippetView
+    menu: Vistoq
+    menu_option: Provision Security Service
+    attributes:
+      snippet: cnc-conf
+      title: Configure Service Sales information
+      header: Provision Service
+
+  - name: provision
+    class: ProvisionSnippetView
