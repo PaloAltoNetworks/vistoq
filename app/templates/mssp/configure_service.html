@@ -1,4 +1,4 @@
-{% extends "mssp/base.html" %}
+{% extends base_html %}
 {% load static %}
 
 {% block content %}
@@ -10,7 +10,7 @@
             <p class="card-text">
             <form action="/mssp/provision" method="post">
                 {% csrf_token %}
-                {% include 'mssp/bootstrap_form.html' with form=form %}
+                {% include 'pan_cnc/bootstrap_form.html' with form=form %}
                 <input type="hidden" name="service_id" value="{{ service.name }}"/>
                 <input type="hidden" name="customer_name" value="{{ customer_name }}"/>
                 <input type="hidden" name="snippet_name" value="{{ snippet_name }}"/>

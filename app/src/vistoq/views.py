@@ -52,6 +52,9 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
     snippet = 'provision_firewall'
     base_html = 'vistoq/base.html'
 
+    def get_snippet(self):
+        return self.snippet
+
     def get_context_data(self, **kwargs):
         """
         Override get_context_data so we can modify the SimpleDemoForm as necessary.

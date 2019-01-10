@@ -123,5 +123,14 @@ views:
       title: Deployment Information
       base_html: vistoq/base.html
 
+  - name: delete_vm
+    class: DeleteVMView
+    parameters:
+      - minion
+      - hostname
+    attributes:
+      header: VM-Series Deployment
+      title: Delete Firewall
+      base_html: vistoq/base.html
 
 
