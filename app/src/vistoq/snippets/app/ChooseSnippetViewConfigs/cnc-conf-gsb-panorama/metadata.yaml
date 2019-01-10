@@ -41,10 +41,10 @@ variables:
     dd_list:
       - key: 3 Year
         value: 3
-      - key: 2 Year
-        value: 2
       - key: 1 Year
         value: 1
+      - key: Monthly
+        value: M
   - name: service_size
     description: Service Size
     default: Small
