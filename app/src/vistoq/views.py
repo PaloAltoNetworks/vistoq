@@ -35,7 +35,7 @@ class ViewServicesView(CNCBaseAuth, TemplateView):
 
 
 class ViewMinionsView(CNCBaseAuth, TemplateView):
-    template_name = "mssp/minion_list.html"
+    template_name = "vistoq/minion_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +46,7 @@ class ViewMinionsView(CNCBaseAuth, TemplateView):
 
 
 class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
-    template_name = 'mssp/deploy_service.html'
+    # template_name = 'vistoq/deploy_service.html'
     snippet = 'provision_firewall'
 
     def get_context_data(self, **kwargs):
@@ -103,11 +103,11 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
             print('Could not load results from provisioner!')
             print(ve)
             context['results'] = 'Error deploying VM!'
-            return render(self.request, 'mssp/results.html', context=context)
+            return render(self.request, 'vistoq/results.html', context=context)
 
         if 'minion' not in jinja_context:
             context['results'] = 'Error deploying VM! No compute node found in response'
-            return render(self.request, 'mssp/results.html', context=context)
+            return render(self.request, 'vistoq/results.html', context=context)
 
         minion = jinja_context['minion']
         if 'return' in results_json and minion in results_json['return'][0]:
@@ -118,10 +118,10 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
                 if step_detail['result'] is not True:
                     context['results'] = 'Error deploying VM! Not all steps completed successfully!\n\n'
                     context['results'] += step_detail['comment']
-                    return render(self.request, 'mssp/results.html', context=context)
+                    return render(self.request, 'vistoq/results.html', context=context)
 
         context['results'] = 'VM Deployed Successfully on CPE: %s' % minion
-        return render(self.request, 'mssp/results.html', context=context)
+        return render(self.request, 'vistoq/results.html', context=context)
 
 
 class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
@@ -135,7 +135,7 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
     snippet = 'show_deployed_vms_on_node'
     header = 'Vistoq MSSP'
     title = 'Show Deployed VMs on Node'
-    action = '/mssp/vms'
+    action = '/vistoq/vms'
 
     def get_context_data(self, **kwargs):
         """
@@ -183,7 +183,7 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
         try:
             if res is None:
                 context['results'] = 'Could not get deployed VM list, no valid return from CPE'
-                return render(self.request, 'mssp/results.html', context=context)
+                return render(self.request, 'vistoq/results.html', context=context)
 
             response_obj = json.loads(res)
             # {"return": [{"compute-01.c.vistoq-demo.internal": {"shoaf1": "shutdown", "stuart1": "shutdown"}}]}
@@ -199,19 +199,19 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
 
                 context['vms'] = vms
                 context['minion'] = minion
-                return render(self.request, 'mssp/deployed_vms.html', context=context)
+                return render(self.request, 'vistoq/deployed_vms.html', context=context)
             else:
                 context['results'] = response_obj['return'][0]
-                return render(self.request, 'mssp/results.html', context=context)
+                return render(self.request, 'vistoq/results.html', context=context)
         except ValueError as ve:
             print('Could not parse json')
             print(ve)
             context['results'] = {'Error': 'Could not get deployed VMs list!'}
-            return render(self.request, 'mssp/results.html', context=context)
+            return render(self.request, 'vistoq/results.html', context=context)
 
 
 class DeleteVMView(TemplateView):
-    template_name = 'mssp/results.html'
+    template_name = 'vistoq/results.html'
 
     def get_context_data(self, **kwargs):
         hostname = self.kwargs['hostname']
@@ -234,7 +234,7 @@ class DeleteVMView(TemplateView):
 
 class GPCSView(CNCBaseAuth, CNCBaseFormView):
     """
-    /mssp/configure
+    /vistoq/configure
 
     This will instantiate the SimpleDemoForm from forms.py
 
@@ -244,7 +244,7 @@ class GPCSView(CNCBaseAuth, CNCBaseFormView):
     snippet = 'cnc-conf-gpcs'
     header = 'Provision Service: GPCS'
     title = 'Configure Service Sales information: GPCS'
-    app_dir = 'mssp'
+    app_dir = 'vistoq'
 
     def get_context_data(self, **kwargs):
         """
