@@ -1,0 +1,62 @@
+name: cnc-conf-gsb-panorama
+label: Service Picker
+description: Vistoq Advanced Security
+type: template
+
+labels:
+  customize_field: snippet_name
+  customize_label_name: service_type
+  customize_label_value: internet_gateway_panorama
+
+extends:
+variables:
+  - name: customer_name
+    description: Customer Name
+    default: ACME
+    type_hint: dropdown
+    dd_list:
+      - key: PAN-A7-40646123 - Cara S. Mcintosh
+        value: Mcintosh
+      - key: PAN-A8-89390058 - Carter Hawkins
+        value: Hawkins
+      - key: PAN-A7-34061387 - Ella V. Durham
+        value: Durham
+      - key: PAN-A9-42896926 - Jaden Hubbard
+        value: Hubbard
+      - key: PAN-A8-08492225 - Cadman D. Blanchard
+        value: Blanchard
+      - key: PAN-A8-99098632 - Ebony B. Bray
+        value: Bray
+      - key: PAN-B8-62338140 - Kiayada Petty
+        value: Petty
+
+  - name: snippet_name
+    description: Service Tier
+    default: Gold
+    type_hint: text
+  - name: service_term
+    description: Service Term
+    default: 3 year
+    type_hint: dropdown
+    dd_list:
+      - key: 3 Year
+        value: 3
+      - key: 2 Year
+        value: 2
+      - key: 1 Year
+        value: 1
+  - name: service_size
+    description: Service Size
+    default: Small
+    type_hint: dropdown
+    dd_list:
+      - key: Small
+        value: small
+      - key: Medium
+        value: medium
+      - key: Large
+        value: large
+
+
+snippets:
+
