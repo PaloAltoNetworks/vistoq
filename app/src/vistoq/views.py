@@ -309,6 +309,11 @@ class gsbWorkflow02(ProvisionSnippetView):
 
     def generate_dynamic_form(self):
 
+        # get customer name and use for fw name
+        customer_name = self.get_value_from_workflow('customer_name', '')
+        self.save_value_to_workflow('FW_NAME', customer_name)
+
+        # only show the FW_NAME field to validate name used
         self.fields_to_render = ['FW_NAME']
 
         # save local workflow data to jinja context for template render
