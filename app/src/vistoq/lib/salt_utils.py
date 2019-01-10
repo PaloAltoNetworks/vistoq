@@ -20,6 +20,7 @@ import requests
 from django.conf import settings
 from jinja2 import Environment, BaseLoader
 from requests.exceptions import ConnectionError
+from pan_cnc.lib import snippet_utils
 
 
 class SaltUtil():
@@ -106,34 +107,51 @@ class SaltUtil():
 
         return minion_list
 
-    def deploy_service(self, service, context):
+    def deploy_template(self, template):
         if not self.__get_salt_auth_token():
             print('Could not connect to provisioner')
-            return 'No good'
+            return 'Could not login to provisioner!'
 
-        snippets_dir = Path(os.path.join(settings.BASE_DIR, 'mssp', 'snippets'))
-
+        url = self.base_url + '/'
+        headers = {"X-Auth-Token": self._auth_token}
+        payload_json = json.loads(template)
         try:
-            for snippet in service['snippets']:
-                template_name = snippet['file']
+            res = requests.post(url, json=payload_json, headers=headers)
+            print(res.status_code)
+            return res.text
+        except ConnectionError as ce:
+            print(ce)
+            return 'Error during deploy'
 
-                template_full_path = os.path.join(snippets_dir, service['name'], template_name)
-                with open(template_full_path, 'r') as template:
-                    template_string = template.read()
-                    template_template = Environment(loader=BaseLoader()).from_string(template_string)
-                    payload = template_template.render(context)
-                    print(payload)
-                    url = self.base_url + '/'
-                    headers = {"X-Auth-Token": self._auth_token}
-                    payload_json = json.loads(payload)
-                    try:
-                        res = requests.post(url, json=payload_json, headers=headers)
-                        print(res.status_code)
-                        return res.text
-                    except ConnectionError as ce:
-                        print(ce)
-                        return 'Error during deploy'
-
-        except Exception as e:
-            print(e)
-            print('Caught an error deploying service')
+    # def deploy_service(self, service, context):
+    #     if not self.__get_salt_auth_token():
+    #         print('Could not connect to provisioner')
+    #         return 'No good'
+    #
+    #     snippets_dir = Path(os.path.join(settings.BASE_DIR, 'mssp', 'snippets'))
+    #
+    #     template = snippet_utils.render_snippet_template()
+    #     try:
+    #         for snippet in service['snippets']:
+    #             template_name = snippet['file']
+    #
+    #             template_full_path = os.path.join(snippets_dir, service['name'], template_name)
+    #             with open(template_full_path, 'r') as template:
+    #                 template_string = template.read()
+    #                 template_template = Environment(loader=BaseLoader()).from_string(template_string)
+    #                 payload = template_template.render(context)
+    #                 print(payload)
+    #                 url = self.base_url + '/'
+    #                 headers = {"X-Auth-Token": self._auth_token}
+    #                 payload_json = json.loads(payload)
+    #                 try:
+    #                     res = requests.post(url, json=payload_json, headers=headers)
+    #                     print(res.status_code)
+    #                     return res.text
+    #                 except ConnectionError as ce:
+    #                     print(ce)
+    #                     return 'Error during deploy'
+    #
+    #     except Exception as e:
+    #         print(e)
+    #         print('Caught an error deploying service')

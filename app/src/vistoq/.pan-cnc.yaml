@@ -108,9 +108,20 @@ views:
     class: DeployServiceView
     menu: Deploy
     menu_option: Deploy Firewall
+    attributes:
+      header: VM-Series Deployment
+      title: Deployment Information
+      base_html: vistoq/base.html
 
 
-
+  - name: view_deployed_vms
+    class: ViewDeployedVmsView
+    menu: Deploy
+    menu_option: View Deployed Firewalls
+    attributes:
+      header: VM-Series Deployment
+      title: Deployment Information
+      base_html: vistoq/base.html
 
 
 

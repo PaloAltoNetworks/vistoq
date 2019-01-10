@@ -26,6 +26,7 @@ from vistoq.lib import salt_utils
 
 class ViewServicesView(CNCBaseAuth, TemplateView):
     template_name = "mssp/service_list.html"
+    base_html = 'vistoq/base.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -36,6 +37,7 @@ class ViewServicesView(CNCBaseAuth, TemplateView):
 
 class ViewMinionsView(CNCBaseAuth, TemplateView):
     template_name = "vistoq/minion_list.html"
+    base_html = 'vistoq/base.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -48,6 +50,7 @@ class ViewMinionsView(CNCBaseAuth, TemplateView):
 class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
     # template_name = 'vistoq/deploy_service.html'
     snippet = 'provision_firewall'
+    base_html = 'vistoq/base.html'
 
     def get_context_data(self, **kwargs):
         """
@@ -86,28 +89,36 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
         return context
 
     def form_valid(self, form):
-        print('Here we go deploying')
+        print('Here we go deploying %s' % self.app_dir)
         jinja_context = dict()
         service = snippet_utils.load_snippet_with_name('provision_firewall', self.app_dir)
+        template = snippet_utils.render_snippet_template(service, self.app_dir, jinja_context)
 
         for v in service['variables']:
             if self.request.POST.get(v['name']):
                 jinja_context[v['name']] = self.request.POST.get(v['name'])
 
         salt_util = salt_utils.SaltUtil()
-        res = salt_util.deploy_service(service, jinja_context)
+        res = salt_util.deploy_template(template)
         context = dict()
+        context['base_html'] = self.base_html
+
         try:
             results_json = json.loads(res)
         except ValueError as ve:
             print('Could not load results from provisioner!')
             print(ve)
             context['results'] = 'Error deploying VM!'
-            return render(self.request, 'vistoq/results.html', context=context)
+            return render(self.request, 'pan_cnc/results.html', context=context)
+        except TypeError as te:
+            print('Could not load results from provisioner!')
+            print(te)
+            context['results'] = 'Error deploying VM!'
+            return render(self.request, 'pan_cnc/results.html', context=context)
 
         if 'minion' not in jinja_context:
             context['results'] = 'Error deploying VM! No compute node found in response'
-            return render(self.request, 'vistoq/results.html', context=context)
+            return render(self.request, 'pan_cnc/results.html', context=context)
 
         minion = jinja_context['minion']
         if 'return' in results_json and minion in results_json['return'][0]:
@@ -118,10 +129,10 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
                 if step_detail['result'] is not True:
                     context['results'] = 'Error deploying VM! Not all steps completed successfully!\n\n'
                     context['results'] += step_detail['comment']
-                    return render(self.request, 'vistoq/results.html', context=context)
+                    return render(self.request, 'pan_cnc/results.html', context=context)
 
         context['results'] = 'VM Deployed Successfully on CPE: %s' % minion
-        return render(self.request, 'vistoq/results.html', context=context)
+        return render(self.request, 'pan_cnc/results.html', context=context)
 
 
 class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
@@ -136,6 +147,7 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
     header = 'Vistoq MSSP'
     title = 'Show Deployed VMs on Node'
     action = '/vistoq/vms'
+    base_html = 'vistoq/base.html'
 
     def get_context_data(self, **kwargs):
         """
@@ -177,13 +189,17 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
         print('Here we go deploying')
         minion = self.get_value_from_workflow('minion', '')
         salt_util = salt_utils.SaltUtil()
-        res = salt_util.deploy_service(self.service, self.get_workflow())
+
+        template = snippet_utils.render_snippet_template(self.service, self.app_dir, self.get_workflow())
+
+        res = salt_util.deploy_template(template)
         context = dict()
+        context['base_html'] = self.base_html
 
         try:
             if res is None:
                 context['results'] = 'Could not get deployed VM list, no valid return from CPE'
-                return render(self.request, 'vistoq/results.html', context=context)
+                return render(self.request, 'pan_cnc/results.html', context=context)
 
             response_obj = json.loads(res)
             # {"return": [{"compute-01.c.vistoq-demo.internal": {"shoaf1": "shutdown", "stuart1": "shutdown"}}]}
@@ -202,31 +218,35 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
                 return render(self.request, 'vistoq/deployed_vms.html', context=context)
             else:
                 context['results'] = response_obj['return'][0]
-                return render(self.request, 'vistoq/results.html', context=context)
+                return render(self.request, 'pan_cnc/results.html', context=context)
         except ValueError as ve:
             print('Could not parse json')
             print(ve)
             context['results'] = {'Error': 'Could not get deployed VMs list!'}
-            return render(self.request, 'vistoq/results.html', context=context)
+            return render(self.request, 'pan_cnc/results.html', context=context)
 
 
 class DeleteVMView(TemplateView):
-    template_name = 'vistoq/results.html'
+    template_name = 'pan_cnc/results.html'
+    base_html = 'vistoq/base.html'
 
     def get_context_data(self, **kwargs):
         hostname = self.kwargs['hostname']
         minion = self.kwargs['minion']
+
         service = snippet_utils.load_snippet_with_name('delete_single_vm', self.app_dir)
         jinja_context = dict()
         for v in service['variables']:
             if kwargs.get(v['name']):
                 jinja_context[v['name']] = kwargs.get(v['name'])
 
+        template = snippet_utils.render_snippet_template(service, self.app_dir, jinja_context)
         salt_util = salt_utils.SaltUtil()
-        res = salt_util.deploy_service(service, jinja_context)
+        res = salt_util.deploy_template(template)
         print(res)
         print('deleting hostname %s' % hostname)
         context = dict()
+        context['base_html'] = self.base_html
         context['results'] = res
 
         return context
@@ -292,6 +312,7 @@ class GPCSView(CNCBaseAuth, CNCBaseFormView):
 
 class gsbProvisionView(ProvisionSnippetView):
     base_html = 'vistoq/base.html'
+
     def generate_dynamic_form(self):
         simple_service = self.get_value_from_workflow('simple_service', '')
         print('simple service is ' + simple_service)
@@ -303,6 +324,7 @@ class gsbProvisionView(ProvisionSnippetView):
         self.save_workflow_to_session()
 
         return super().generate_dynamic_form()
+
 
 class gsbWorkflow02(ProvisionSnippetView):
     base_html = 'vistoq/base.html'
@@ -324,7 +346,6 @@ class gsbWorkflow02(ProvisionSnippetView):
 
         self.save_value_to_workflow('sku', sku)
         print('sku is {0}'.format(sku))
-
 
     def generate_dynamic_form(self):
 
