@@ -1,36 +1,116 @@
 name: vistoq
 
-repositories:
-  - name: Iron-Skillet
-    url: https://github.com/PaloAltoNetworks/iron-skillet.git
-    branch: 81dev
-    destination_directory: iron-skillet-81dev
-  - name: MSSP Templates
-    url:  https://github.com/scotchoaf/mssp-templates.git
-    branch: 81dev
-    destination_directory: gsb81
+#repositories:
+#  - name: Iron-Skillet-v81
+#    url: https://github.com/PaloAltoNetworks/iron-skillet.git
+#    branch: panos_v8.1
+#    destination_directory: iron_skillet_v81
+#    repositories:
+#  - name: MSSP Templates
+#    url:  https://github.com/scotchoaf/mssp-templates.git
+#    branch: panos_v8.1
+#    destination_directory: mssp_templates_v81
 
 views:
+
   - name: ''
     class: CNCView
-#    menu: Vistoq
-#    menu_option: Welcome
+    menu: Easy Button Security Service
+    menu_option: Welcome
     attributes:
       template_name: pan_cnc/welcome.html
+      base_html: vistoq/base.html
     context:
       title: Vistoq
-      description: Welcome to the Vistoq Security Operations Portal
-      documentation_link: http://vistoq.readthedocs.io
-      next: configure
+      description: MSSP Security Service Configurations
+      documentation_link: http://mssp-templates.readthedocs.io
 
-  - name: configure
-    class: ChooseSnippetView
-    menu: Vistoq
-    menu_option: Provision Security Service
+  - name: easybutton
+    class: vistoqChooseSnippetView
+    menu: Easy Button Security Service
+    menu_option: Basic Internet Gateway
     attributes:
-      snippet: cnc-conf
-      title: Configure Service Sales information
-      header: Provision Service
+      snippet: cnc-conf-gsb-panorama
+      header: Initial Service Request
+      title: Select Service Options
+      next_url: gsbworkflow02
+
+  - name: gsbworkflow02
+    class: gsbWorkflow02
+    attributes:
+      header: Provisioning Inputs
+      title: Add Configuration Data
+      next_url: deployfw
+
+  - name: gsbconfig
+    class: vistoqChooseSnippetView
+    menu: MSSP Security Offerings
+    menu_option: Basic Internet Gateway
+    attributes:
+      snippet: cnc-conf-gsb-panorama
+      header: Initial Service Request
+      title: Select Configuration Options
+      next_url: gsbworkflow01
+
+  - name: gsbconfigpanos
+    class: vistoqChooseSnippetView
+    menu: MSSP Security Offerings
+    menu_option: Basic Internet Gateway for PAN-OS
+    attributes:
+      snippet: cnc-conf-gsb-panos
+      header: Initial Service Request
+      title: Select Configuration Option
+      next_url: gsbworkflow01
+
+  - name: gsbworkflow01
+    class: gsbProvisionView
+    attributes:
+      next_url: provision
+
+  - name: gsbsetconfig
+    class: ChooseSnippetByLabelView
+    menu: MSSP Security Offerings
+    menu_option: GSB SET commands
+    attributes:
+      label_name: service_type
+      label_value: internet_gateway_set
+      header: Choose set command file
+      title: Select Configuration Option
+
+  - name: provisionfw
+    class: ProvisionSnippetView
+    attributes:
+      next_url: deployfw
+
+  - name: gpcsconfig
+    class: vistoqChooseSnippetView
+    menu: MSSP Security Offerings
+    menu_option: Global Protect Cloud Service
+    attributes:
+      snippet: cnc-conf-gpcs
+      header: Initial Service Request
+      title: Select Configuration Option
+
+  - name: gpcscpeconfig
+    class: ChooseSnippetByLabelView
+    menu: MSSP Security Offerings
+    menu_option: GPCS CPE Helper Configs
+    attributes:
+      label_name: service_type
+      label_value: gpcs-cpe
+      header: Select CPE Type
+      title: Select Configuration Option
 
   - name: provision
     class: ProvisionSnippetView
+
+  - name: deployfw
+    class: DeployServiceView
+    menu: Deploy
+    menu_option: Deploy Firewall
+
+
+
+
+
+
