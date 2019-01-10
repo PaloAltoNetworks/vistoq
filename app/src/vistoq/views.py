@@ -51,6 +51,7 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
     # template_name = 'vistoq/deploy_service.html'
     snippet = 'provision_firewall'
     base_html = 'vistoq/base.html'
+    app_dir = 'vistoq'
 
     def get_snippet(self):
         return self.snippet
@@ -151,6 +152,7 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
     title = 'Show Deployed VMs on Node'
     action = '/vistoq/vms'
     base_html = 'vistoq/base.html'
+    app_dir = 'vistoq'
 
     def get_context_data(self, **kwargs):
         """
@@ -232,6 +234,7 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
 class DeleteVMView(TemplateView):
     template_name = 'pan_cnc/results.html'
     base_html = 'vistoq/base.html'
+    app_dir = 'vistoq'
 
     def get_context_data(self, **kwargs):
         hostname = self.kwargs['hostname']
