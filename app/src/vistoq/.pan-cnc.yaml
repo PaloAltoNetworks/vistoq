@@ -26,7 +26,7 @@ views:
       documentation_link: http://mssp-templates.readthedocs.io
 
   - name: easybutton
-    class: vistoqChooseSnippetView
+    class: VistoqChooseSnippetView
     menu: Easy Button Security Service
     menu_option: Basic Internet Gateway
     attributes:
@@ -36,14 +36,14 @@ views:
       next_url: gsbworkflow02
 
   - name: gsbworkflow02
-    class: gsbWorkflow02
+    class: GsbWorkflow02
     attributes:
       header: Provisioning Inputs
       title: Add Configuration Data
       next_url: deployfw
 
   - name: gsbconfig
-    class: vistoqChooseSnippetView
+    class: VistoqChooseSnippetView
     menu: MSSP Security Offerings
     menu_option: Basic Internet Gateway
     attributes:
@@ -53,7 +53,7 @@ views:
       next_url: gsbworkflow01
 
   - name: gsbconfigpanos
-    class: vistoqChooseSnippetView
+    class: VistoqChooseSnippetView
     menu: MSSP Security Offerings
     menu_option: Basic Internet Gateway for PAN-OS
     attributes:
@@ -63,7 +63,7 @@ views:
       next_url: gsbworkflow01
 
   - name: gsbworkflow01
-    class: gsbProvisionView
+    class: GsbProvisionView
     attributes:
       next_url: provision
 
@@ -83,7 +83,7 @@ views:
       next_url: deployfw
 
   - name: gpcsconfig
-    class: vistoqChooseSnippetView
+    class: VistoqChooseSnippetView
     menu: MSSP Security Offerings
     menu_option: Global Protect Cloud Service
     attributes:
@@ -133,4 +133,7 @@ views:
       title: Delete Firewall
       base_html: vistoq/base.html
 
-
+  - name: panorama
+    class: VistoqRedirectView
+    menu: Admin
+    menu_option: View Panorama

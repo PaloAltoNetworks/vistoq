@@ -16,13 +16,14 @@ import json
 
 from django import forms
 from django.shortcuts import render, HttpResponseRedirect
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
+from django.contrib import messages
 
 from pan_cnc.lib import pan_utils
 from pan_cnc.lib import snippet_utils
 from pan_cnc.lib import cnc_utils
 
-from pan_cnc.views import CNCBaseFormView, CNCBaseAuth, ProvisionSnippetView, ChooseSnippetView
+from pan_cnc.views import CNCBaseFormView, CNCBaseAuth, ProvisionSnippetView, ChooseSnippetView, CNCView
 from vistoq.lib import salt_utils
 
 
@@ -49,7 +50,7 @@ class ViewMinionsView(CNCBaseAuth, TemplateView):
         return context
 
 
-class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
+class DeployServiceView(CNCBaseFormView):
     # template_name = 'vistoq/deploy_service.html'
     snippet = 'provision_firewall'
     base_html = 'vistoq/base.html'
@@ -77,6 +78,12 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
         print(panorama_ip)
         self.save_value_to_workflow('vm_auth_key', vm_auth_key)
         self.save_value_to_workflow('panorama_ip', panorama_ip)
+
+        # Ensure we capture FW_NAME in case that has been set previously (easy button case)
+        fw_name = self.get_value_from_workflow('FW_NAME', '')
+        if fw_name != '':
+            self.save_value_to_workflow('vm_name', fw_name)
+
         context = super().get_context_data(**kwargs)
         form = context['form']
 
@@ -121,6 +128,8 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
         print(res)
         context = dict()
         context['base_html'] = self.base_html
+        context['title'] = 'Deploy Next Generation Firewall'
+        context['header'] = 'Deployment Results'
 
         try:
             results_json = json.loads(res)
@@ -154,7 +163,7 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
         return render(self.request, 'pan_cnc/results.html', context=context)
 
 
-class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
+class ViewDeployedVmsView(CNCBaseFormView):
     """
     Show all the VMs currently deployed on the compute node
 
@@ -168,6 +177,9 @@ class ViewDeployedVmsView(CNCBaseAuth, CNCBaseFormView):
     action = '/vistoq/vms'
     base_html = 'vistoq/base.html'
     app_dir = 'vistoq'
+
+    def get_snippet(self):
+        return self.snippet
 
     def get_context_data(self, **kwargs):
         """
@@ -273,7 +285,7 @@ class DeleteVMView(TemplateView):
         return context
 
 
-class GPCSView(CNCBaseAuth, CNCBaseFormView):
+class GPCSView(CNCBaseFormView):
     """
     /vistoq/configure
 
@@ -331,7 +343,7 @@ class GPCSView(CNCBaseAuth, CNCBaseFormView):
         return HttpResponseRedirect('provision')
 
 
-class gsbProvisionView(ProvisionSnippetView):
+class GsbProvisionView(ProvisionSnippetView):
     base_html = 'vistoq/base.html'
 
     def generate_dynamic_form(self):
@@ -347,7 +359,7 @@ class gsbProvisionView(ProvisionSnippetView):
         return super().generate_dynamic_form()
 
 
-class gsbWorkflow02(ProvisionSnippetView):
+class GsbWorkflow02(ProvisionSnippetView):
     base_html = 'vistoq/base.html'
 
     def create_sku(self):
@@ -403,6 +415,27 @@ class gsbWorkflow02(ProvisionSnippetView):
         return super().form_valid(form)
 
 
-class vistoqChooseSnippetView(ChooseSnippetView):
+class VistoqChooseSnippetView(ChooseSnippetView):
     base_html = 'vistoq/base.html'
 
+
+class VistoqRedirectView(CNCView):
+
+    template_name = 'vistoq/redirect.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        panorama_ip = cnc_utils.get_config_value('PANORAMA_IP', '0.0.0.0')
+        if panorama_ip == '0.0.0.0':
+            panorama_ip = self.get_value_from_workflow('TARGET_IP', '0.0.0.0')
+            if panorama_ip == '0.0.0.0':
+                print('Could not load panorama ip')
+                messages.add_message(self.request, messages.ERROR, 'Could not locate Panorama Configuration')
+                context['redirect_link'] = '/'
+                return context
+
+            context['redirect_link'] = f'https://{panorama_ip}'
+        else:
+            context['redirect_link'] = f'https://{panorama_ip}'
+
+        return context
