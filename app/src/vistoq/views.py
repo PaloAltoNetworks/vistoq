@@ -20,6 +20,8 @@ from django.views.generic import TemplateView
 
 from pan_cnc.lib import pan_utils
 from pan_cnc.lib import snippet_utils
+from pan_cnc.lib import cnc_utils
+
 from pan_cnc.views import CNCBaseFormView, CNCBaseAuth, ProvisionSnippetView, ChooseSnippetView
 from vistoq.lib import salt_utils
 
@@ -58,12 +60,23 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
 
     def get_context_data(self, **kwargs):
         """
-        Override get_context_data so we can modify the SimpleDemoForm as necessary.
-        We want to dynamically add all the snippets in the snippets dir as choice fields on the form
+        Override get_context_data so we can modify the context as necessary
         :param kwargs:
         :return:
         """
+        print('Getting vm_auth_key')
+        vm_auth_key = self.get_value_from_workflow('vm_auth_key', '')
+        if vm_auth_key == '':
+            vm_auth_key = pan_utils.get_vm_auth_key_from_panorama()
+            vakl = vm_auth_key.split(' ')
+            if len(vakl) > 2:
+                vm_auth_key = vakl[3]
 
+        print(vm_auth_key)
+        panorama_ip = cnc_utils.get_config_value('PANORAMA_IP', '0.0.0.0')
+        print(panorama_ip)
+        self.save_value_to_workflow('vm_auth_key', vm_auth_key)
+        self.save_value_to_workflow('panorama_ip', panorama_ip)
         context = super().get_context_data(**kwargs)
         form = context['form']
 
@@ -96,14 +109,16 @@ class DeployServiceView(CNCBaseAuth, CNCBaseFormView):
         print('Here we go deploying %s' % self.app_dir)
         jinja_context = dict()
         service = snippet_utils.load_snippet_with_name('provision_firewall', self.app_dir)
-        template = snippet_utils.render_snippet_template(service, self.app_dir, jinja_context)
-
         for v in service['variables']:
             if self.request.POST.get(v['name']):
                 jinja_context[v['name']] = self.request.POST.get(v['name'])
 
+        template = snippet_utils.render_snippet_template(service, self.app_dir, jinja_context)
+        print(template)
+
         salt_util = salt_utils.SaltUtil()
         res = salt_util.deploy_template(template)
+        print(res)
         context = dict()
         context['base_html'] = self.base_html
 
