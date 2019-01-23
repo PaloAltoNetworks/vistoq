@@ -15,19 +15,17 @@
 import json
 
 from django import forms
-from django.shortcuts import render, HttpResponseRedirect
-from django.views.generic import TemplateView, RedirectView
 from django.contrib import messages
+from django.shortcuts import render, HttpResponseRedirect
 
+from pan_cnc.lib import cnc_utils
 from pan_cnc.lib import pan_utils
 from pan_cnc.lib import snippet_utils
-from pan_cnc.lib import cnc_utils
-
-from pan_cnc.views import CNCBaseFormView, CNCBaseAuth, ProvisionSnippetView, ChooseSnippetView, CNCView
+from pan_cnc.views import CNCBaseFormView, ProvisionSnippetView, ChooseSnippetView, CNCView
 from vistoq.lib import salt_utils
 
 
-class ViewServicesView(CNCBaseAuth, TemplateView):
+class ViewServicesView(CNCView):
     template_name = "mssp/service_list.html"
     base_html = 'vistoq/base.html'
 
@@ -38,7 +36,7 @@ class ViewServicesView(CNCBaseAuth, TemplateView):
         return context
 
 
-class ViewMinionsView(CNCBaseAuth, TemplateView):
+class ViewMinionsView(CNCView):
     template_name = "vistoq/minion_list.html"
     base_html = 'vistoq/base.html'
 
@@ -258,7 +256,7 @@ class ViewDeployedVmsView(CNCBaseFormView):
             return render(self.request, 'pan_cnc/results.html', context=context)
 
 
-class DeleteVMView(TemplateView):
+class DeleteVMView(CNCView):
     template_name = 'pan_cnc/results.html'
     base_html = 'vistoq/base.html'
     app_dir = 'vistoq'
@@ -363,11 +361,10 @@ class GsbWorkflow02(ProvisionSnippetView):
     base_html = 'vistoq/base.html'
 
     def create_sku(self):
-
         # decoder ring to map menu values to SKU elements
-        sku_tier = { 'gold': 'BND2', 'silver': 'BND1', 'bronze': 'BASIC'}
-        sku_size = { 'small': 'VM-50', 'medium': 'VM-300', 'large': 'VM-500'}
-        sku_term = { 'M': 'MU', '1': 'YU', '3': '3YU'}
+        sku_tier = {'gold': 'BND2', 'silver': 'BND1', 'bronze': 'BASIC'}
+        sku_size = {'small': 'VM-50', 'medium': 'VM-300', 'large': 'VM-500'}
+        sku_term = {'M': 'MU', '1': 'YU', '3': '3YU'}
 
         user_tier = self.get_value_from_workflow('snippet_name', '').split('_')[0]
         user_size = self.get_value_from_workflow('service_size', '')
@@ -381,7 +378,6 @@ class GsbWorkflow02(ProvisionSnippetView):
         print('sku is {0}'.format(sku))
 
     def generate_dynamic_form(self):
-
         # get customer name and use for fw name
         customer_name = self.get_value_from_workflow('customer_name', '')
         self.save_value_to_workflow('FW_NAME', customer_name)
@@ -420,7 +416,6 @@ class VistoqChooseSnippetView(ChooseSnippetView):
 
 
 class VistoqRedirectView(CNCView):
-
     template_name = 'vistoq/redirect.html'
 
     def get_context_data(self, **kwargs):
