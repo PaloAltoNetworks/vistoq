@@ -405,6 +405,8 @@ class GsbWorkflow02(ProvisionSnippetView):
         # set stack and device-group names to fw_name
         self.save_value_to_workflow('STACK', fw_name)
         self.save_value_to_workflow('DEVICE_GROUP', fw_name)
+        # Force Gold and Silver to NOT include EDL rules
+        self.save_value_to_workflow('INCLUDE_PAN_EDL', False)
 
         print('set device-group and stack to firewall name')
 
