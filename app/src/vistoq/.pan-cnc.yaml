@@ -63,7 +63,7 @@ views:
       next_url: gsbworkflow01
 
   - name: gsbworkflow01
-    class: GsbProvisionView
+    class: GsbWorkflow02
     attributes:
       next_url: provision
 
