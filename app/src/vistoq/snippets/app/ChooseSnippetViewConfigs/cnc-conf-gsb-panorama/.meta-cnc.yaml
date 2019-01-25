@@ -29,10 +29,9 @@ variables:
         value: Bray
       - key: PAN-B8-62338140 - Kiayada Petty
         value: Petty
-
   - name: snippet_name
     description: Service Tier
-    default: Gold
+    default: gold
     type_hint: text
   - name: service_term
     description: Service Term

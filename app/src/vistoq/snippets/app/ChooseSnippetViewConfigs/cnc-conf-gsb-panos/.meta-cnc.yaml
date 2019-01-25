@@ -16,13 +16,23 @@ variables:
     type_hint: dropdown
     dd_list:
       - key: PAN-A7-40646123 - Cara S. Mcintosh
-        value: PAN-A7-40646123
+        value: Mcintosh
       - key: PAN-A8-89390058 - Carter Hawkins
-        value: PAN-A8-89390058
+        value: Hawkins
+      - key: PAN-A7-34061387 - Ella V. Durham
+        value: Durham
+      - key: PAN-A9-42896926 - Jaden Hubbard
+        value: Hubbard
+      - key: PAN-A8-08492225 - Cadman D. Blanchard
+        value: Blanchard
+      - key: PAN-A8-99098632 - Ebony B. Bray
+        value: Bray
+      - key: PAN-B8-62338140 - Kiayada Petty
+        value: Petty
 
   - name: snippet_name
     description: Service Tier
-    default: Gold
+    default: gold
     type_hint: text
   - name: service_term
     description: Service Term
@@ -31,10 +41,10 @@ variables:
     dd_list:
       - key: 3 Year
         value: 3
-      - key: 2 Year
-        value: 2
       - key: 1 Year
         value: 1
+      - key: Monthly
+        value: M
   - name: service_size
     description: Service Size
     default: Small
@@ -46,10 +56,6 @@ variables:
         value: medium
       - key: Large
         value: large
-  - name: simple_service
-    description: Auto-configure service values
-    default: on
-    type_hint: simplecheckbox
 
 snippets:
 

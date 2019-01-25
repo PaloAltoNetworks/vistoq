@@ -416,58 +416,6 @@ class GsbWorkflow02(ProvisionSnippetView):
 class VistoqChooseSnippetView(ChooseSnippetView):
     base_html = 'vistoq/base.html'
 
-    def create_sku(self):
-        # decoder ring to map menu values to SKU elements
-        sku_tier = {'gold': 'BND2', 'silver': 'BND1', 'bronze': 'BASIC'}
-        sku_size = {'small': 'VM-50', 'medium': 'VM-300', 'large': 'VM-500'}
-        sku_term = {'M': 'MU', '1': 'YU', '3': '3YU'}
-
-        user_tier = self.get_value_from_workflow('snippet_name', '').split('_')[0]
-        user_size = self.get_value_from_workflow('service_size', '')
-        user_term = self.get_value_from_workflow('service_term', '')
-
-        sku = 'PAN-{0}-SP-BKLN-{1}-{2}'.format(sku_size[user_size],
-                                               sku_tier[user_tier],
-                                               sku_term[user_term])
-
-        self.save_value_to_workflow('sku', sku)
-        print('sku is {0}'.format(sku))
-
-    def generate_dynamic_form(self):
-        # get customer name and use for fw name
-        customer_name = self.get_value_from_workflow('customer_name', '')
-        self.save_value_to_workflow('FW_NAME', customer_name)
-
-        # only show the FW_NAME field to validate name used
-        self.fields_to_render = ['FW_NAME']
-
-        # create a sku value based on form input data
-        self.create_sku()
-        # save local workflow data to jinja context for template render
-        self.save_workflow_to_session()
-
-        return super().generate_dynamic_form()
-
-    def form_valid(self, form):
-        """
-        Called when the simple demo form is submitted
-        :param form: SimpleDemoForm
-        :return: rendered html response
-        """
-
-        # get FW_NAME value from form submit
-        fw_name = self.get_value_from_workflow('FW_NAME', '')
-
-        # set stack and device-group names to fw_name
-        self.save_value_to_workflow('STACK', fw_name)
-        self.save_value_to_workflow('DEVICE_GROUP', fw_name)
-        # Force Gold and Silver to NOT include EDL rules
-        self.save_value_to_workflow('INCLUDE_PAN_EDL', 'False')
-
-        print('set device-group and stack to firewall name')
-
-        return super().form_valid(form)
-
 
 class VistoqRedirectView(CNCView):
     template_name = 'vistoq/redirect.html'

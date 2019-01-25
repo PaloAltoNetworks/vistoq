@@ -15,7 +15,7 @@ views:
 
   - name: ''
     class: CNCView
-    menu: Easy Button Security Service
+    menu: Simple Security Service Demos
     menu_option: Welcome
     attributes:
       template_name: pan_cnc/welcome.html
@@ -24,10 +24,11 @@ views:
       title: Vistoq
       description: MSSP Security Service Configurations
       documentation_link: http://mssp-templates.readthedocs.io
+      next: simpledemo
 
-  - name: easybutton
+  - name: simpledemo
     class: VistoqChooseSnippetView
-    menu: Easy Button Security Service
+    menu: Simple Security Service Demos
     menu_option: Basic Internet Gateway
     attributes:
       snippet: cnc-conf-gsb-panorama
