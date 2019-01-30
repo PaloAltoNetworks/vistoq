@@ -2,7 +2,7 @@
 FROM python:alpine
 
 LABEL description="Vistoq Demo Portal"
-LABEL version="0.5"
+LABEL version="0.5.8"
 LABEL maintainer="sp-solutions@paloaltonetworks.com"
 
 
