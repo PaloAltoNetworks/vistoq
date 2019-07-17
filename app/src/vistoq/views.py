@@ -377,7 +377,7 @@ class GsbWorkflow02(ProvisionSnippetView):
         self.save_value_to_workflow('sku', sku)
         print('sku is {0}'.format(sku))
 
-    def generate_dynamic_form(self):
+    def generate_dynamic_form(self, data=None):
         # get customer name and use for fw name
         customer_name = self.get_value_from_workflow('customer_name', '')
         self.save_value_to_workflow('FW_NAME', customer_name)
@@ -390,7 +390,8 @@ class GsbWorkflow02(ProvisionSnippetView):
         # save local workflow data to jinja context for template render
         self.save_workflow_to_session()
 
-        return super().generate_dynamic_form()
+        print('returning generated dynamic form upstream')
+        return super().generate_dynamic_form(data)
 
     def form_valid(self, form):
         """

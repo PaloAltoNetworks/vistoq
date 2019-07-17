@@ -1,39 +1,47 @@
-
-FROM python:alpine
+FROM python:3.7-alpine
 
 LABEL description="Vistoq Demo Portal"
 LABEL version="0.5"
 LABEL maintainer="sp-solutions@paloaltonetworks.com"
 
+ENV TERRAFORM_VERSION=0.11.13
+ENV TERRAFORM_SHA256SUM=5925cd4d81e7d8f42a0054df2aafd66e2ab7408dbed2bd748f0022cfe592f8d2
+ENV CNC_USERNAME=vistoq
+ENV CNC_PASSWORD=Vistoq123
+ENV CNC_HOME=/home/cnc_user
+ENV CNC_APP=Vistoq
 
 WORKDIR /app
-ADD app/requirements.txt /app/requirements.txt
-ADD app/cnc/requirements.txt /app/cnc/requirements.txt
-RUN apk add --update --no-cache  git gcc musl-dev python3-dev libffi-dev openssl-dev docker
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN pip install -r cnc/requirements.txt
-COPY app/src /app/src
+ADD requirements.txt /app/requirements.txt
+
 COPY app/cnc /app/cnc
-#COPY tests /app/tests
+COPY app/src /app/src
 
-ENV TERRAFORM_VERSION=0.11.11
-ENV TERRAFORM_SHA256SUM=94504f4a67bad612b5c8e3a4b7ce6ca2772b3c1559630dfd71e9c519e3d6149c
-
-RUN echo "===> Installing Terraform..."  && \
-    apk add --update git curl openssh && \
+RUN apk add --update --no-cache git curl openssh gcc g++ make cmake musl-dev python3-dev libffi-dev openssl-dev \
+    linux-headers bash && \
+    pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt && \
+    echo "===> Installing Terraform..."  && \
     curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip > terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     echo "${TERRAFORM_SHA256SUM}  terraform_${TERRAFORM_VERSION}_linux_amd64.zip" > terraform_${TERRAFORM_VERSION}_SHA256SUMS && \
     sha256sum -cs terraform_${TERRAFORM_VERSION}_SHA256SUMS && \
     unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin && \
     rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip  && \
-    rm -f terraform_${TERRAFORM_VERSION}_SHA256SUMS
+    rm -f terraform_${TERRAFORM_VERSION}_SHA256SUMS && \
+    if [ -f /app/cnc/db.sqlite3 ]; then rm /app/cnc/db.sqlite3; fi && \
+    addgroup -S cnc_group && adduser -S cnc_user -G cnc_group && \
+    chgrp cnc_group /app/cnc && \
+    chgrp cnc_group /app/src/vistoq/snippets && \
+    chgrp -R cnc_group /app/cnc/assets && \
+    chmod -R g+w /app/cnc/assets && \
+    chmod g+w /app/cnc && \
+    chmod g+w /app/src/vistoq/snippets
 
-RUN if [ -f /app/cnc/db.sqlite3 ]; then rm /app/cnc/db.sqlite3; fi
-RUN python /app/cnc/manage.py migrate
-RUN python /app/cnc/manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('vistoq', 'admin@example.com', 'Vistoq123')"
+# Run  Prisma Public Cloud Vulnerability Scan API
+RUN curl -i -s -X POST https://scanapi.redlock.io/v1/vuln/os \
+ -F "fileName=/etc/alpine-release" -F "file=@/etc/alpine-release" \
+ -F "fileName=/lib/apk/db/installed" -F "file=@/lib/apk/db/installed" \
+ -F "rl_args=report=detail" | grep -i "x-redlock-scancode: pass"
 
 EXPOSE 80
-#CMD ["python", "/app/cnc/manage.py", "runserver", "0.0.0.0:80"]
-ENTRYPOINT ["/app/cnc/start_app.sh"]
+CMD ["/app/cnc/start_app.sh"]
 
