@@ -64,12 +64,14 @@ class DeployServiceView(CNCBaseFormView):
         :return:
         """
         print('Getting vm_auth_key')
-        vm_auth_key = self.get_value_from_workflow('vm_auth_key', '')
-        if vm_auth_key == '':
+        vm_auth_key = cnc_utils.get_long_term_cached_value(self.app_dir, 'vm_auth_key')
+        if vm_auth_key is None:
             vm_auth_key = pan_utils.get_vm_auth_key_from_panorama()
             vakl = vm_auth_key.split(' ')
             if len(vakl) > 2:
                 vm_auth_key = vakl[3]
+                # cache this value for 23 and 45 minute hours, the lifetime by default is 24 hours
+                cnc_utils.set_long_term_cached_value(self.app_dir, 'vm_auth_key', vm_auth_key, 85500)
 
         print(vm_auth_key)
         panorama_ip = cnc_utils.get_config_value('PANORAMA_IP', '0.0.0.0')
