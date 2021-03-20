@@ -3,7 +3,7 @@ chardet==3.0.4
 Django==2.1.2
 django-widget-tweaks==1.4.3
 idna==2.7
-Jinja2==2.10
+Jinja2==2.11.3
 MarkupSafe==1.0
 oyaml==0.7
 pan-python==0.13.0

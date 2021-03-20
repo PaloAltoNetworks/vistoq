@@ -10,7 +10,7 @@ docker-pycreds==0.4.0
 gitdb2==2.0.5
 GitPython==2.1.11
 idna==2.8
-Jinja2==2.10
+Jinja2==2.11.3
 MarkupSafe==1.1.0
 oyaml==0.7
 pan-python==0.14.0
