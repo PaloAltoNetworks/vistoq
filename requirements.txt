@@ -1,4 +1,4 @@
-certifi==2018.10.15
+certifi==2023.7.22
 chardet==3.0.4
 Django==2.1.2
 django-widget-tweaks==1.4.3
